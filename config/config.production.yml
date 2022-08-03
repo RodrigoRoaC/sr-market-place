@@ -1,0 +1,7 @@
+default:
+  service:
+    name: sr-market-place
+    port: 4000
+    jwt: 
+  metadata:
+    enviroment: local
