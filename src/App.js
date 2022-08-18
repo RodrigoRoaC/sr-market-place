@@ -2,6 +2,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const helmet = require('helmet');
+const { initDatabases } = require('./database');
 
 class App {
   express;
@@ -9,17 +10,15 @@ class App {
 
   constructor() {
     this.express = express();
-    // this.initDatabases();
+    this.initDatabases();
+    
     // this.logger = ?
-
-    // this.initDatabase();
     this.setMiddlewares();
     this.setRoutes();
   }
 
-
   initDatabases() {
-
+    initDatabases();
   }
 
   setMiddlewares() {

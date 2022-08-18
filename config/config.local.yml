@@ -3,5 +3,13 @@ default:
     name: sr-market-place
     port: 4000
     jwt: 
+    databases:
+      main:
+        dialect: postgresql
+        host: 127.0.0.1
+        port: 5432
+        dbName: marketplacedb
+        user: postgres
+        password: developer123
   metadata:
     enviroment: local
