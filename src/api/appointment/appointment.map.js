@@ -36,7 +36,7 @@ const getUpdatePacientValues = ({
 
 const getPacientValues = ({
   nombres = null,
-  apellido = null,
+  ape_paterno = null,
   edad = null,
   departamento = null,
   provincia = null,
@@ -50,7 +50,7 @@ const getPacientValues = ({
   cod_tipo_doc,
   num_documento,
   nombres,
-  apellido,
+  ape_paterno,
   departamento,
   provincia,
   distrito,
@@ -74,8 +74,8 @@ const getAppointmentValues = ({
 }) => ([
   cod_paciente,
   cod_usuario,
-  cod_tipo_atencion,
-  cod_tipo_servicio,
+  (cod_tipo_atencion || null),
+  (cod_tipo_servicio || null),
   cod_modalidad,
   sintomas,
   diagnostico,

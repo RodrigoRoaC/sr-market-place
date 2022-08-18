@@ -14,9 +14,14 @@ function NotFound(res, data = { message: 'Not found' }) {
   return res.status(404).send(data);
 }
 
+function Forbidden(res, data = { message: 'Not found' }) {
+  return res.status(403).send(data);
+}
+
 module.exports = {
   Ok,
   BadRequest,
   BDError,
   NotFound,
+  Forbidden,
 }

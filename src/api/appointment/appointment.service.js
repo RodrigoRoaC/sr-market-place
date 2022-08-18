@@ -1,4 +1,5 @@
 const postgresql = require('../../database/postgresql');
+const { toComboData } = require('../../utils/parser');
 const { getPacientValues, getAppointmentValues, parseAppointment, getUpdatePacientValues, getUpdateAppointmentValues } = require('./appointment.map');
 const AppointmentQueries = require('./appointment.querys');
 
@@ -23,6 +24,7 @@ async function getByOperatorId(id) {
 async function add(appointment) {
   const client = await postgresql.getConnectionClient();
   const formatAppointment = parseAppointment(appointment);
+
   try {
     await client.query('BEGIN');
 
@@ -48,7 +50,7 @@ async function add(appointment) {
         `INSERT INTO 
           pacientes(cod_paciente, cod_usuario, cod_plan, fec_registro, fec_actualizacion)
           VALUES(nextval('seq_cod_paciente'), $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING cod_paciente`,
-        [newUser.rows[0].cod_usuario, formatAppointment.cod_tipo_plan]
+        [newUser.rows[0].cod_usuario, formatAppointment.cod_plan]
       );
       cod_paciente = newPatient.rows[0].cod_paciente;
     }
@@ -139,9 +141,66 @@ async function assignToOperator(assignObj) {
   }
 }
 
+async function getComboData() {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const departamentoRes = await client.query(`SELECT departamento, descripcion FROM ubigeo WHERE distrito = '00' and provincia = '00' order by descripcion asc`);
+    const tipoDocumentoRes = await client.query('SELECT * FROM tipo_documento');
+
+    const [planes, iafa, atencion, servicio, modalidad] = await Promise.all([
+      client.query('SELECT * FROM planes_salud'),
+      client.query('SELECT * FROM iafa'),
+      client.query('SELECT * FROM tipo_atencion'),
+      client.query('SELECT * FROM tipo_servicio'),
+      client.query('SELECT * FROM modalidad'),
+    ]);
+
+
+    const departamento = toComboData(departamentoRes.rows, 'departamento', 'descripcion');
+    const tipoDocumento = toComboData(tipoDocumentoRes.rows, 'cod_tipo_doc', 'desc_corta');
+    const planesData = toComboData(planes.rows, 'cod_plan', 'desc_plan');
+    const iafaData = toComboData(iafa.rows, 'cod_iafa', 'nom_iafa');
+    const atencionData = toComboData(atencion.rows, 'cod_tipo_atencion', 'descripcion');
+    const servicioData = toComboData(servicio.rows, 'tipo_servicio', 'descripcion');
+    const modalidadData = toComboData(modalidad.rows, 'cod_modalidad', 'descripcion');
+
+    const data = { departamento, tipoDocumento, planesData, iafaData, atencionData, servicioData, modalidadData };
+    return { data }
+  } catch(err) {
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
+async function remove(body) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    await client.query('BEGIN');
+
+    await client.query(
+      `UPDATE solicitud SET cod_estado = 5 WHERE cod_solicitud = $1`,
+      [body.cod_solicitud]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: body.cod_solicitud }
+  } catch(err) {
+    await client.query('ROLLBACK');
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   getByOperatorId,
   add,
   update,
   assignToOperator,
+  getComboData,
+  remove,
 }

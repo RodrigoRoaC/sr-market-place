@@ -57,12 +57,31 @@ class AppointmentController {
       return BadRequest(res, { message: 'You must provide a body' });
     }
 
-    const { error, data } = await AppointmentService.assignToOperator(body);
+    const { error, details, data } = await AppointmentService.assignToOperator(body);
     if (error) {
-      return BDError(res, error);
+      return BDError(res, details);
     }
 
     return Ok(res, data);
+  }
+
+  async getComboData(req = request, res = response) {
+    const { error, details, data } = await AppointmentService.getComboData();
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
+
+  async delete(req = request, res = response) {
+    const body = req.body;
+    const { error, details, data } = await AppointmentService.remove(body);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, { data });
   }
 }
 
