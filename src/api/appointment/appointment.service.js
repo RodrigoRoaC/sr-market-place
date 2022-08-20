@@ -1,7 +1,9 @@
 const postgresql = require('../../database/postgresql');
 const { toComboData } = require('../../utils/parser');
-const { getPacientValues, getAppointmentValues, parseAppointment, getUpdatePacientValues, getUpdateAppointmentValues } = require('./appointment.map');
-const AppointmentQueries = require('./appointment.querys');
+const { addUserValues, addAppointmentValues, parseAppointment, updateUserValues, updateAppointmentValues } = require('./appointment.map');
+const AppointmentQueries = require('./appointment.queries');
+const UserQueries = require('../user/user.queries');
+const UbigeoQueries = require('../ubigeo/ubigeo.queries');
 
 async function getByOperatorId(id) {
   const client = await postgresql.getConnectionClient();
@@ -15,7 +17,7 @@ async function getByOperatorId(id) {
   } catch(err) {
     console.error('An error occurred while fetching', err);
 
-    return { error: true, details: err }
+    return { error: true, details: err };
   } finally {
     client.release();
   }
@@ -28,34 +30,20 @@ async function add(appointment) {
   try {
     await client.query('BEGIN');
 
-    const patient = await client.query(
-      'SELECT * FROM usuarios INNER JOIN pacientes ON pacientes.cod_usuario = usuarios.cod_usuario WHERE num_documento = $1',
-      [formatAppointment.num_documento]
-    );
+    const patient = await client.query(UserQueries.getClientIdBy('num_documento = $1'), [formatAppointment.num_documento]);
     let cod_paciente = patient.rows[0]?.cod_paciente;
     if (cod_paciente) {
-      await client.query(
-        `UPDATE usuarios 
-          SET nombres = $1, ape_paterno = $2, departamento = $3, provincia = $4, distrito = $5, email = $6, direccion = $7, telefono1 = $8 WHERE cod_usuario = $9`,
-        [...getUpdatePacientValues({ ...appointment, cod_usuario: patient.rows[0]?.cod_usuario })]
-      );
+      await client.query(UserQueries.update, updateUserValues({ ...appointment, cod_usuario: patient.rows[0]?.cod_usuario }));
     } else {
-      const newUser = await client.query(
-        `INSERT INTO 
-          usuarios(cod_usuario, cod_tipo_doc, num_documento, nombres, ape_paterno, departamento, provincia, distrito, email, direccion, telefono1, cod_perfil, fec_registro, fec_actualizacion) 
-        VALUES(nextval('seq_cod_usuario'), $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING cod_usuario`,
-        [...getPacientValues(formatAppointment)]
-      );
+      const newUser = await client.query(UserQueries.register, addUserValues(formatAppointment));
       const newPatient = await client.query(
-        `INSERT INTO 
-          pacientes(cod_paciente, cod_usuario, cod_plan, fec_registro, fec_actualizacion)
-          VALUES(nextval('seq_cod_paciente'), $1, $2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING cod_paciente`,
+        UserQueries.registerPatient,
         [newUser.rows[0].cod_usuario, formatAppointment.cod_plan]
       );
       cod_paciente = newPatient.rows[0].cod_paciente;
     }
 
-    const newSolicitud = await client.query(AppointmentQueries.insert, getAppointmentValues({ ...formatAppointment, cod_paciente }));
+    const newSolicitud = await client.query(AppointmentQueries.insert, addAppointmentValues({ ...formatAppointment, cod_paciente }));
 
     const appointments = await client.query(
       AppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
@@ -68,7 +56,7 @@ async function add(appointment) {
   } catch(err) {
     await client.query('ROLLBACK');
 
-    return { error: true, details: err }
+    return { error: true, details: err };
   } finally {
     client.release();
   }
@@ -80,29 +68,25 @@ async function update(appointment) {
   try {
     await client.query('BEGIN');
     const patientUser = await client.query(
-      'SELECT * FROM pacientes where pacientes.cod_paciente = $1',
+      UserQueries.getPatientBy('pacientes.cod_paciente = $1'),
       [formatAppointment.cod_paciente]
     );
 
+    const codPatientUser = patientUser.rows[0]?.cod_usuario;
+    if (!codPatientUser) {
+      return { error: true, details: { message: 'Patient user not found' } };
+    }
+
     if (formatAppointment.cod_plan) {
       await client.query(
-        'UPDATE pacientes SET cod_plan = $1, fec_actualizacion = $2 WHERE pacientes.cod_paciente = $3',
+        UserQueries.updatePatientPlan,
         [formatAppointment.cod_plan, new Date(), formatAppointment.cod_paciente]
       );
     }
 
-    await client.query(
-      `UPDATE usuarios 
-        SET nombres = $1, ape_paterno = $2, departamento = $3, provincia = $4, distrito = $5, email = $6, direccion = $7, telefono1 = $8 WHERE cod_usuario = $9`,
-      [...getUpdatePacientValues({ ...appointment, cod_usuario: patientUser.rows[0]?.cod_usuario })]
-    );
+    await client.query(UserQueries.update, updateUserValues({ ...appointment, cod_usuario: codPatientUser }));
 
-    await client.query(
-      `UPDATE solicitud
-        SET cod_tipo_atencion = $1, cod_tipo_servicio = $2, cod_modalidad = $3, sintomas = $4, diagnostico = $5, fecha_programacion = $6, hora_programacion = $7, fecha_autorizacion = $8, numero_autorizacion = $9, fec_actualizacion = $10
-        WHERE cod_solicitud = $11`,
-      [...getUpdateAppointmentValues(formatAppointment)]
-    );
+    await client.query(AppointmentQueries.update, updateAppointmentValues(formatAppointment));
 
     const appointments = await client.query(
       AppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
@@ -114,7 +98,7 @@ async function update(appointment) {
     return { data: appointments.rows[0] };
   } catch(err) {
     await client.query('ROLLBACK');
-    console.log(err);
+
     return { error: true, details: err };
   } finally {
     client.release();
@@ -126,10 +110,7 @@ async function assignToOperator(assignObj) {
   try {
     await client.query('BEGIN');
 
-    await client.query(
-      'UPDATE solicitud SET cod_usuario = $1 WHERE cod_solicitud = $2',
-      [assignObj.cod_usuario, assignObj.cod_solicitud]
-    );
+    await client.query(AppointmentQueries.assignTo, [assignObj.cod_usuario, assignObj.cod_solicitud]);
 
     await client.query('COMMIT');
   } catch(err) {
@@ -144,7 +125,7 @@ async function assignToOperator(assignObj) {
 async function getComboData() {
   const client = await postgresql.getConnectionClient();
   try {
-    const departamentoRes = await client.query(`SELECT departamento, descripcion FROM ubigeo WHERE distrito = '00' and provincia = '00' order by descripcion asc`);
+    const departamentoRes = await client.query(UbigeoQueries.getDepartamentos);
     const tipoDocumentoRes = await client.query('SELECT * FROM tipo_documento');
 
     const [planes, iafa, atencion, servicio, modalidad] = await Promise.all([
@@ -155,7 +136,6 @@ async function getComboData() {
       client.query('SELECT * FROM modalidad'),
     ]);
 
-
     const departamento = toComboData(departamentoRes.rows, 'departamento', 'descripcion');
     const tipoDocumento = toComboData(tipoDocumentoRes.rows, 'cod_tipo_doc', 'desc_corta');
     const planesData = toComboData(planes.rows, 'cod_plan', 'desc_plan');
@@ -165,7 +145,7 @@ async function getComboData() {
     const modalidadData = toComboData(modalidad.rows, 'cod_modalidad', 'descripcion');
 
     const data = { departamento, tipoDocumento, planesData, iafaData, atencionData, servicioData, modalidadData };
-    return { data }
+    return { data };
   } catch(err) {
 
     return { error: true, details: err };
@@ -179,14 +159,11 @@ async function remove(body) {
   try {
     await client.query('BEGIN');
 
-    await client.query(
-      `UPDATE solicitud SET cod_estado = 5 WHERE cod_solicitud = $1`,
-      [body.cod_solicitud]
-    );
+    await client.query(AppointmentQueries.remove, [body.cod_solicitud]);
 
     await client.query('COMMIT');
 
-    return { data: body.cod_solicitud }
+    return { data: body.cod_solicitud };
   } catch(err) {
     await client.query('ROLLBACK');
 

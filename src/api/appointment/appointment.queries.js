@@ -65,7 +65,49 @@ const insert =
   VALUES(nextval('seq_cod_solicitud'), $1, $2, $3, $4, $5, 2, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING cod_solicitud
 `;
 
+const update = 
+`
+  UPDATE 
+    solicitud
+  SET 
+    cod_tipo_atencion = $1, 
+    cod_tipo_servicio = $2, 
+    cod_modalidad = $3, 
+    sintomas = $4, 
+    diagnostico = $5, 
+    fecha_programacion = $6, 
+    hora_programacion = $7, 
+    fecha_autorizacion = $8, 
+    numero_autorizacion = $9, 
+    fec_actualizacion = $10
+  WHERE 
+    cod_solicitud = $11
+`;
+
+const remove = 
+`
+  UPDATE 
+    solicitud 
+  SET 
+    cod_estado = 5 
+  WHERE 
+    cod_solicitud = $1
+`;
+
+const assignTo = 
+`
+  UPDATE 
+    solicitud 
+  SET 
+    cod_usuario = $1 
+  WHERE 
+    cod_solicitud = $2
+`;
+
 module.exports = {
   getAppointmentBy,
   insert,
+  update,
+  remove,
+  assignTo,
 }
