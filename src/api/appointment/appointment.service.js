@@ -113,6 +113,8 @@ async function assignToOperator(assignObj) {
     await client.query(AppointmentQueries.assignTo, [assignObj.cod_usuario, assignObj.cod_solicitud]);
 
     await client.query('COMMIT');
+
+    return { data: { message: 'Assign appointment successful' } };
   } catch(err) {
     await client.query('ROLLBACK');
 
@@ -141,7 +143,7 @@ async function getComboData() {
     const planesData = toComboData(planes.rows, 'cod_plan', 'desc_plan');
     const iafaData = toComboData(iafa.rows, 'cod_iafa', 'nom_iafa');
     const atencionData = toComboData(atencion.rows, 'cod_tipo_atencion', 'descripcion');
-    const servicioData = toComboData(servicio.rows, 'tipo_servicio', 'descripcion');
+    const servicioData = toComboData(servicio.rows, 'cod_tipo_servicio', 'descripcion');
     const modalidadData = toComboData(modalidad.rows, 'cod_modalidad', 'descripcion');
 
     const data = { departamento, tipoDocumento, planesData, iafaData, atencionData, servicioData, modalidadData };

@@ -56,7 +56,7 @@ class AppointmentController {
     if (!body) {
       return BadRequest(res, { message: 'You must provide a body' });
     }
-
+    console.log('body', body);
     const { error, details, data } = await AppointmentService.assignToOperator(body);
     if (error) {
       return BDError(res, details);

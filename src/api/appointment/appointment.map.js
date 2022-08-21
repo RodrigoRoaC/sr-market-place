@@ -14,23 +14,24 @@ const parseAppointment = ({
 
 const updateUserValues = ({
   nombres = null,
-  apellido = null,
+  ape_paterno = null,
+  edad = null,
   departamento = null,
   provincia = null,
   distrito = null,
   email = null,
   direccion = null,
-  telefono = null,
+  telefono1 = null,
   cod_usuario
 }) => ([
   nombres,
-  apellido,
+  ape_paterno,
   departamento,
   provincia,
   distrito,
   email,
   direccion,
-  telefono,
+  telefono1,
   cod_usuario
 ]);
 
@@ -45,7 +46,7 @@ const addUserValues = ({
   num_documento = null,
   email = null,
   direccion = null,
-  telefono = null,
+  telefono1 = null,
 }) => ([
   cod_tipo_doc,
   num_documento,
@@ -56,7 +57,7 @@ const addUserValues = ({
   distrito,
   email,
   direccion,
-  telefono,
+  telefono1,
 ]);
 
 const addAppointmentValues = ({

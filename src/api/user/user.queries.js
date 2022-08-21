@@ -84,7 +84,7 @@ const registerPatient =
     CURRENT_TIMESTAMP
     ) 
   RETURNING cod_paciente        
-`
+`;
 
 const getPatientBy = (whereParams) =>
 `
@@ -107,6 +107,17 @@ const updatePatientPlan =
     pacientes.cod_paciente = $3
 `;
 
+const getOperators =
+`
+  SELECT
+    cod_usuario, 
+    concat(nombres, ' ', ape_paterno) AS nombres
+  FROM 
+    usuarios
+  WHERE
+    usuarios.cod_perfil = 3
+`;
+
 module.exports = {
   getClientIdBy,
   update,
@@ -114,4 +125,5 @@ module.exports = {
   registerPatient,
   getPatientBy,
   updatePatientPlan,
+  getOperators,
 }

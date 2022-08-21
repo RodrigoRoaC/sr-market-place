@@ -1,11 +1,11 @@
 const postgresql = require('../../database/postgresql');
 
-async function authenticate({ username, clave, num_documento }) {
+async function authenticate({ username, clave }) {
   const client = await postgresql.getConnectionClient();
   try {
     const userData = await client.query(
-      'SELECT * FROM usuarios WHERE username = $1 and clave = $2 and num_documento = $3', 
-      [username, clave, num_documento]
+      'SELECT * FROM usuarios WHERE username = $1 and clave = $2', 
+      [username, clave]
     );
 
     return { data: userData.rows[0] };
