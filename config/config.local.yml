@@ -11,5 +11,14 @@ default:
         dbName: marketplacedb
         user: postgres
         password: developer123
+    mail: 
+      host: smtp.gmail.com
+      name: CMD ©
+      user: rooaasg@gmail.com
+      pass: aliiwpjthijnhbos
+      port: 587
+      cc: []
+      replyToMail: noreply@laprotectora.com
+      replyToName: no-reply
   metadata:
     enviroment: local

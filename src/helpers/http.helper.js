@@ -18,10 +18,15 @@ function Forbidden(res, data = { message: 'Not found' }) {
   return res.status(403).send(data);
 }
 
+function ExternalServiceError(res, data = { message: 'External error' }) {
+  return res.status(900).send(data);
+}
+
 module.exports = {
   Ok,
   BadRequest,
   BDError,
   NotFound,
   Forbidden,
+  ExternalServiceError,
 }
