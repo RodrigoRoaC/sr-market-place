@@ -18,14 +18,18 @@ const update =
   SET 
     nombres = $1, 
     ape_paterno = $2, 
-    departamento = $3, 
-    provincia = $4, 
-    distrito = $5, 
-    email = $6, 
-    direccion = $7, 
-    telefono1 = $8 
+    ape_materno = $3, 
+    fec_nacimiento = $4, 
+    departamento = $5, 
+    provincia = $6, 
+    distrito = $7, 
+    email = $8, 
+    direccion = $9, 
+    telefono1 = $10, 
+    telefono2 = $11,
+    fec_actualizacion = CURRENT_TIMESTAMP
   WHERE 
-    cod_usuario = $9
+    cod_usuario = $12
 `;
 
 const register = 
@@ -37,12 +41,15 @@ const register =
       num_documento, 
       nombres, 
       ape_paterno, 
+      ape_materno, 
+      fec_nacimiento, 
       departamento, 
       provincia, 
       distrito, 
       email, 
       direccion, 
       telefono1, 
+      telefono2, 
       cod_perfil, 
       fec_registro, 
       fec_actualizacion
@@ -59,6 +66,9 @@ const register =
     $8, 
     $9, 
     $10, 
+    $11, 
+    $12, 
+    $13, 
     7, 
     CURRENT_TIMESTAMP, 
     CURRENT_TIMESTAMP

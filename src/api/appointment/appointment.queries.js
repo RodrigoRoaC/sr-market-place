@@ -14,6 +14,7 @@ const getAppointmentBy = (whereParams) =>
     solicitud.fecha_programacion,
     solicitud.fecha_autorizacion,
     solicitud.hora_programacion,
+    solicitud.numero_autorizacion,
     solicitud.sintomas,
     solicitud.diagnostico,
     pacientes.cod_paciente,
@@ -21,6 +22,7 @@ const getAppointmentBy = (whereParams) =>
     usuarios.nombres,
     usuarios.ape_paterno,
     usuarios.ape_materno,
+    usuarios.fec_nacimiento,
     usuarios.cod_tipo_doc,
     usuarios.num_documento,
     usuarios.departamento,
@@ -28,7 +30,8 @@ const getAppointmentBy = (whereParams) =>
     usuarios.distrito,
     usuarios.direccion,
     usuarios.email,
-    usuarios.telefono1
+    usuarios.telefono1,
+    usuarios.telefono2
   FROM 
     solicitud
   INNER JOIN
@@ -40,6 +43,8 @@ const getAppointmentBy = (whereParams) =>
   LEFT JOIN 
     planes_salud ON planes_salud.cod_plan = pacientes.cod_plan
   WHERE solicitud.cod_estado != 5 ${whereParams ? `AND ${whereParams}` : ''}
+  ORDER BY
+    solicitud.fec_actualizacion desc
 `;
 
 const insert = 
@@ -62,7 +67,23 @@ const insert =
       fec_registro, 
       fec_actualizacion
     )
-  VALUES(nextval('seq_cod_solicitud'), $1, $2, $3, $4, $5, 2, $6, $7, $8, $9, $10, $11, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) RETURNING cod_solicitud
+  VALUES(
+    nextval('seq_cod_solicitud'), 
+    $1, 
+    $2, 
+    $3, 
+    $4, 
+    $5, 
+    2, 
+    $6, 
+    $7, 
+    $8, 
+    $9, 
+    $10, 
+    $11, 
+    CURRENT_TIMESTAMP, 
+    CURRENT_TIMESTAMP
+  ) RETURNING cod_solicitud
 `;
 
 const update = 
