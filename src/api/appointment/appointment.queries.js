@@ -62,8 +62,6 @@ const insert =
       diagnostico, 
       fecha_programacion, 
       hora_programacion, 
-      fecha_autorizacion, 
-      numero_autorizacion, 
       fec_registro, 
       fec_actualizacion
     )
@@ -79,8 +77,6 @@ const insert =
     $7, 
     $8, 
     $9, 
-    $10, 
-    $11, 
     CURRENT_TIMESTAMP, 
     CURRENT_TIMESTAMP
   ) RETURNING cod_solicitud
@@ -98,11 +94,9 @@ const update =
     diagnostico = $5, 
     fecha_programacion = $6, 
     hora_programacion = $7, 
-    fecha_autorizacion = $8, 
-    numero_autorizacion = $9, 
-    fec_actualizacion = $10
+    fec_actualizacion = $8
   WHERE 
-    cod_solicitud = $11
+    cod_solicitud = $9
 `;
 
 const remove = 

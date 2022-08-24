@@ -79,11 +79,9 @@ const addAppointmentValues = ({
   cod_tipo_servicio = null,
   cod_modalidad = null,
   fecha_programacion = null,
-  fecha_autorizacion = null,
   hora_programacion = null,
   sintomas = null,
   diagnostico = null,
-  numero_autorizacion = null
 }) => ([
   cod_paciente,
   cod_usuario,
@@ -94,8 +92,6 @@ const addAppointmentValues = ({
   diagnostico,
   fecha_programacion,
   hora_programacion,
-  fecha_autorizacion,
-  numero_autorizacion,
 ]);
 
 const updateAppointmentValues = ({
@@ -104,9 +100,7 @@ const updateAppointmentValues = ({
   cod_tipo_servicio = null,
   cod_modalidad = null,
   fecha_programacion = null,
-  fecha_autorizacion = null,
   hora_programacion = null,
-  numero_autorizacion = null,
   sintomas = null,
   diagnostico = null
 }) => ([
@@ -117,11 +111,9 @@ const updateAppointmentValues = ({
   diagnostico,
   fecha_programacion,
   hora_programacion,
-  fecha_autorizacion,
-  numero_autorizacion,
   new Date(),
   cod_solicitud,
-])
+]);
 
 module.exports = {
   updateUserValues,

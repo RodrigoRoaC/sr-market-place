@@ -1,10 +1,16 @@
 const postgresql = require('../../database/postgresql');
+const { addPaymentValues, updatePaymentValues } = require('./payment.map');
+const PaymentQueries = require('./payment.queries');
 
 async function getPayments(operatorId) {
   const client = await postgresql.getConnectionClient();
   try {
+    const payments = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'solicitud.cod_usuario = $1' }),
+      [operatorId]
+    );
 
-    return {}; 
+    return { data: payments.rows }; 
   } catch(err) {
 
     return { error: true, details: err };
@@ -16,8 +22,12 @@ async function getPayments(operatorId) {
 async function getPaymentsByPatient(patientId) {
   const client = await postgresql.getConnectionClient();
   try {
+    const payments = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'solicitud.cod_paciente = $1' }),
+      [patientId]
+    );
 
-    return {}; 
+    return { data: payments.rows }; 
   } catch(err) {
 
     return { error: true, details: err };
@@ -29,9 +39,23 @@ async function getPaymentsByPatient(patientId) {
 async function add(body) {
   const client = await postgresql.getConnectionClient();
   try {
+    await client.query('BEGIN');
 
-    return {}; 
+    const newPayment = await client.query(
+      PaymentQueries.insert,
+      addPaymentValues(body)
+    );
+
+    const paymentAdded = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'pagos.cod_pago = $1' }),
+      [newPayment.rows[0].cod_pago]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: paymentAdded.rows[0] };
   } catch(err) {
+    await client.query('ROLLBACK');
 
     return { error: true, details: err };
   } finally {
@@ -42,9 +66,20 @@ async function add(body) {
 async function update(body) {
   const client = await postgresql.getConnectionClient();
   try {
+    await client.query('BEGIN');
 
-    return {}; 
+    await client.query(PaymentQueries.update, updatePaymentValues(body));
+
+    const paymentAdded = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'pagos.cod_pago = $1' }),
+      [body.cod_pago]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: paymentAdded.rows[0] }; 
   } catch(err) {
+    await client.query('ROLLBACK');
 
     return { error: true, details: err };
   } finally {
@@ -55,8 +90,12 @@ async function update(body) {
 async function remove(body) {
   const client = await postgresql.getConnectionClient();
   try {
+    await client.query(
+      PaymentQueries.remove
+      [new Date(), body.cod_pago]
+    );
 
-    return {}; 
+    return { error: false }; 
   } catch(err) {
 
     return { error: true, details: err };
@@ -68,8 +107,12 @@ async function remove(body) {
 async function sendLinkToEmail(body) {
   const client = await postgresql.getConnectionClient();
   try {
+    await client.query(
+      PaymentQueries.updateLink,
+      [body.cod_pago, body.link_pago]
+    );
 
-    return {}; 
+    return { error: false }; 
   } catch(err) {
 
     return { error: true, details: err };
