@@ -56,7 +56,7 @@ async function add(body) {
     return { data: paymentAdded.rows[0] };
   } catch(err) {
     await client.query('ROLLBACK');
-
+    console.log(err);
     return { error: true, details: err };
   } finally {
     client.release();
