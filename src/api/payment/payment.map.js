@@ -42,7 +42,7 @@ const updatePaymentValues = ({
   fec_actualizacion,
   cod_estado,
   cod_pago,
-])
+]);
 
 module.exports = {
   addPaymentValues,

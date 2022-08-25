@@ -70,14 +70,14 @@ async function update(body) {
 
     await client.query(PaymentQueries.update, updatePaymentValues(body));
 
-    const paymentAdded = await client.query(
+    const paymentUpdated = await client.query(
       PaymentQueries.getPaymentsBy({ whereParams: 'pagos.cod_pago = $1' }),
       [body.cod_pago]
     );
 
     await client.query('COMMIT');
 
-    return { data: paymentAdded.rows[0] }; 
+    return { data: paymentUpdated.rows[0] }; 
   } catch(err) {
     await client.query('ROLLBACK');
 
@@ -126,6 +126,47 @@ async function sendLinkToEmail(body) {
   }
 }
 
+async function updateState(body) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    await client.query('BEGIN');
+
+    await client.query(PaymentQueries.changeState, [body.cod_estado, body.cod_pago]);
+
+    const paymentUpdated = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'pagos.cod_pago = $1' }),
+      [body.cod_pago]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: paymentUpdated.rows[0] }; 
+  } catch(err) {
+    await client.query('ROLLBACK');
+    console.log(err);
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
+async function sendLinkToEmail(body) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    await client.query(
+      PaymentQueries.updateLink,
+      [body.cod_pago, body.link_pago]
+    );
+
+    return { error: false }; 
+  } catch(err) {
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   getPayments,
   getPaymentsByPatient,
@@ -133,4 +174,5 @@ module.exports = {
   update,
   remove,
   sendLinkToEmail,
+  updateState,
 }

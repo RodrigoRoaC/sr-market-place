@@ -72,6 +72,31 @@ class PaymentController {
 
     return Ok(res, { message: 'Link sended successfully', data: data });
   }
+
+  async updateState(req = request, res = response) {
+    const body = req.body;
+    const { error, details, data } = await PaymentService.updateState(body);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
+
+  async confirmPayment(req = request, res = response) {
+    const body = req.body;
+    const { error, details, data } = await PaymentService.updateState(body);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    const { error: emailErr, details: emailDetails } = await sendEmail(body);
+    if (emailErr) {
+      return ExternalServiceError(res, { message: 'Email not sended', details: emailDetails });
+    }
+
+    return Ok(res, { message: 'Link sended successfully', data: data });
+  }
 }
 
 module.exports = PaymentController;

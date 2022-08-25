@@ -1,9 +1,10 @@
 const Config = require('../../utils/config');
 const { createTransport } = require('nodemailer');
+const { getEmailTemplate } = require('./templates');
 
 const config = Config.get();
 
-const sendEmail = async ({ email, nombres, ape_paterno, ape_materno, link_pago, cod_pago }) => {
+const sendEmail = async ({ template, email, subject, ...infoObj }) => {
   const { host, name, pass, port, replyToMail, replyToName, user, cc } = config.service.mail;
 
   const transporter = createTransport({
@@ -22,8 +23,8 @@ const sendEmail = async ({ email, nombres, ape_paterno, ape_materno, link_pago, 
       cc,
       from: `"${name}" <${user}>`,
       replyTo: `"${replyToName}" <${replyToMail}>`,
-      subject: 'Market Place CMD Test',
-      html: `<p>${cod_pago} - ${nombres} ${ape_paterno} ${ape_materno}:: ${link_pago}<p>`,
+      subject: subject || 'Market Place CMD Test',
+      html: getEmailTemplate(template, infoObj),
       to: email,
     });
 

@@ -102,10 +102,21 @@ const update =
     cod_pago = $10
 `;
 
+const changeState = 
+`
+  UPDATE
+    pagos
+  SET
+    cod_estado = $1
+  WHERE
+    cod_pago = $2
+`;
+
 module.exports = {
   getPaymentsBy,
   updateLink,
   remove,
   insert,
   update,
+  changeState,
 }
