@@ -29,7 +29,7 @@ async function getPaymentsByPatient(patientId) {
 
     return { data: payments.rows }; 
   } catch(err) {
-
+    console.log(err);
     return { error: true, details: err };
   } finally {
     client.release();

@@ -128,6 +128,19 @@ const getOperators =
     usuarios.cod_perfil = 3
 `;
 
+const updateUserPayment = 
+`
+  UPDATE
+    usuarios
+  SET
+    nombres = $1,
+    ape_paterno = $2,
+    ape_materno = $3,
+    email = $4
+  WHERE
+    cod_usuario = $5
+`;
+
 module.exports = {
   getClientIdBy,
   update,
@@ -136,4 +149,5 @@ module.exports = {
   getPatientBy,
   updatePatientPlan,
   getOperators,
+  updateUserPayment,
 }

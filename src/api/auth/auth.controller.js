@@ -22,6 +22,24 @@ class AuthController {
     return Ok(res, parseUserAuthResponse(data));
   }
 
+  async authenticateUNR(req = request, res = response) {
+    const user = req.body;
+    if (!user) {
+      return BadRequest(res, { message: 'You must provide a user object' });
+    }
+
+    const { error, details, data } = await AuthService.authenticateUNR(user);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    if (!data) {
+      return NotFound(res, { message: 'User not found' });
+    }
+
+    return Ok(res, parseUserAuthResponse(data));
+  }
+
   async logOut(req = request, res = response) {
     const body = req.body;
     if (!body) {

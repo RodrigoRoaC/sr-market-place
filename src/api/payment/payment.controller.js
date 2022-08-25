@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const { Ok, BDError, BadRequest, ExternalServiceError } = require("../../helpers/http.helper");
 const { sendEmail } = require('../../services/node-mailer');
+const UserService = require('../user/user.service');
 const PaymentService = require('./payment.service');
 
 class PaymentController {
@@ -19,8 +20,13 @@ class PaymentController {
   }
 
   async listByPatient(req = request, res = response) {
-    const patientId = req.query.patientId;
-    const { error, details, data } = await PaymentService.getPaymentsByPatient(patientId);
+    const codUsuario = req.query.codUsuario;
+    const { error: userErr, details: userDet, data: userData } = await UserService.getPatientByUserCode(codUsuario);
+    if (userErr) {
+      return BDError(res, userDet);
+    }
+
+    const { error, details, data } = await PaymentService.getPaymentsByPatient(userData.cod_paciente);
     if (error) {
       return BDError(res, details);
     }
