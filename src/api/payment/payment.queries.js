@@ -80,7 +80,8 @@ const insert =
       $9, 
       CURRENT_TIMESTAMP, 
       CURRENT_TIMESTAMP
-    );
+    )
+  RETURNING cod_pago;
 `;
 
 const update = 
@@ -95,9 +96,10 @@ const update =
     numero_autorizacion = $5,
     fecha_autorizacion = $6,
     observaciones = $7,
-    fec_actualizacion = $8
+    fec_actualizacion = $8,
+    cod_estado = $9
   WHERE
-    cod_pago = $9
+    cod_pago = $10
 `;
 
 module.exports = {

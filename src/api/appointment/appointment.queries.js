@@ -12,9 +12,7 @@ const getAppointmentBy = (whereParams) =>
     planes_salud.cod_iafa,
     
     solicitud.fecha_programacion,
-    solicitud.fecha_autorizacion,
     solicitud.hora_programacion,
-    solicitud.numero_autorizacion,
     solicitud.sintomas,
     solicitud.diagnostico,
     pacientes.cod_paciente,
@@ -94,7 +92,8 @@ const update =
     diagnostico = $5, 
     fecha_programacion = $6, 
     hora_programacion = $7, 
-    fec_actualizacion = $8
+    fec_actualizacion = $8,
+    cod_estado = $2
   WHERE 
     cod_solicitud = $9
 `;

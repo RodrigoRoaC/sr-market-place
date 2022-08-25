@@ -19,7 +19,7 @@ class PaymentController {
   }
 
   async listByPatient(req = request, res = response) {
-    const patientId = req.params.patientId;
+    const patientId = req.query.patientId;
     const { error, details, data } = await PaymentService.getPaymentsByPatient(patientId);
     if (error) {
       return BDError(res, details);

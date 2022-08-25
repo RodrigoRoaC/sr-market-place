@@ -91,11 +91,16 @@ async function remove(body) {
   const client = await postgresql.getConnectionClient();
   try {
     await client.query(
-      PaymentQueries.remove
+      PaymentQueries.remove,
       [new Date(), body.cod_pago]
     );
 
-    return { error: false }; 
+    const paymentRemoved = await client.query(
+      PaymentQueries.getPaymentsBy({ whereParams: 'pagos.cod_pago = $1' }),
+      [body.cod_pago]
+    );
+
+    return { error: false, data: paymentRemoved.rows[0] }; 
   } catch(err) {
 
     return { error: true, details: err };

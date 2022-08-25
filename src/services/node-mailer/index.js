@@ -3,7 +3,7 @@ const { createTransport } = require('nodemailer');
 
 const config = Config.get();
 
-const sendEmail = async ({ email, nombres, ape_paterno, ape_materno, link_pago }) => {
+const sendEmail = async ({ email, nombres, ape_paterno, ape_materno, link_pago, cod_pago }) => {
   const { host, name, pass, port, replyToMail, replyToName, user, cc } = config.service.mail;
 
   const transporter = createTransport({
@@ -23,12 +23,13 @@ const sendEmail = async ({ email, nombres, ape_paterno, ape_materno, link_pago }
       from: `"${name}" <${user}>`,
       replyTo: `"${replyToName}" <${replyToMail}>`,
       subject: 'Market Place CMD Test',
-      html: `<p>${id} - ${nombres} ${ape_paterno} ${ape_materno}:: ${link_pago}<p>`,
+      html: `<p>${cod_pago} - ${nombres} ${ape_paterno} ${ape_materno}:: ${link_pago}<p>`,
       to: email,
     });
 
     return { error: false, details: response }
   } catch (error) {
+
     return { error: true, details: error };
   }
 };

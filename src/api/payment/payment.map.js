@@ -1,8 +1,8 @@
 const addPaymentValues = ({
   cod_solicitud, 
   cod_estado, 
-  link_pago, 
-  deducible, 
+  link_pago = null, 
+  deducible = null, 
   copago = null, 
   numero_boleta = null, 
   numero_autorizacion = null,
@@ -29,6 +29,7 @@ const updatePaymentValues = ({
   fecha_autorizacion = null,
   observaciones = null,
   fec_actualizacion = null,
+  cod_estado = 2,
   cod_pago = null,
 }) => ([
   link_pago,
@@ -39,6 +40,7 @@ const updatePaymentValues = ({
   fecha_autorizacion,
   observaciones,
   fec_actualizacion,
+  cod_estado,
   cod_pago,
 ])
 
