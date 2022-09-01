@@ -93,7 +93,7 @@ const update =
     fecha_programacion = $6, 
     hora_programacion = $7, 
     fec_actualizacion = $8,
-    cod_estado = $2
+    cod_estado = 2
   WHERE 
     cod_solicitud = $9
 `;
@@ -113,9 +113,10 @@ const assignTo =
   UPDATE 
     solicitud 
   SET 
-    cod_usuario = $1 
+    cod_usuario = $1,
+    fec_actualizacion = $2
   WHERE 
-    cod_solicitud = $2
+    cod_solicitud = $3
 `;
 
 module.exports = {

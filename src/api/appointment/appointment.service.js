@@ -110,7 +110,7 @@ async function assignToOperator(assignObj) {
   try {
     await client.query('BEGIN');
 
-    await client.query(AppointmentQueries.assignTo, [assignObj.cod_usuario, assignObj.cod_solicitud]);
+    await client.query(AppointmentQueries.assignTo, [assignObj.cod_usuario, new Date(), assignObj.cod_solicitud]);
 
     await client.query('COMMIT');
 
