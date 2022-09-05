@@ -14,64 +14,6 @@ const parseAppointment = ({
   hora_programacion: parseTime(hora_programacion),
 })
 
-const updateUserValues = ({
-  nombres = null,
-  ape_paterno = null,
-  ape_materno = null,
-  fec_nacimiento,
-  departamento = null,
-  provincia = null,
-  distrito = null,
-  email = null,
-  direccion = null,
-  telefono1 = null,
-  telefono2 = null,
-  cod_usuario
-}) => ([
-  nombres,
-  ape_paterno,
-  ape_materno,
-  fec_nacimiento,
-  departamento,
-  provincia,
-  distrito,
-  email,
-  direccion,
-  telefono1,
-  telefono2,
-  cod_usuario
-]);
-
-const addUserValues = ({
-  nombres = null,
-  ape_paterno = null,
-  ape_materno = null,
-  fec_nacimiento = null,
-  departamento = null,
-  provincia = null,
-  distrito = null,
-  cod_tipo_doc = null,
-  num_documento = null,
-  email = null,
-  direccion = null,
-  telefono1 = null,
-  telefono2 = null,
-}) => ([
-  cod_tipo_doc,
-  num_documento,
-  nombres,
-  ape_paterno,
-  ape_materno,
-  fec_nacimiento,
-  departamento,
-  provincia,
-  distrito,
-  email,
-  direccion,
-  telefono1,
-  telefono2,
-]);
-
 const addAppointmentValues = ({
   cod_paciente = null,
   cod_usuario = null,
@@ -116,8 +58,6 @@ const updateAppointmentValues = ({
 ]);
 
 module.exports = {
-  updateUserValues,
-  addUserValues,
   addAppointmentValues,
   parseAppointment,
   updateAppointmentValues,

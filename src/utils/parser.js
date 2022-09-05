@@ -8,9 +8,12 @@ const toComboData = (array = [], id, descriptcion) => array.map(a => ({
   value: a[id]
 }));
 
+const parseAvailabilityDates = (dates = []) => [parseDateToString(dates[0]), parseDateToString(dates[1])];
+
 module.exports = {
   parseDate,
   parseTime,
   toComboData,
   parseDateToString,
+  parseAvailabilityDates,
 }

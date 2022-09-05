@@ -1,6 +1,6 @@
 const postgresql = require('../../database/postgresql');
 const { toComboData } = require('../../utils/parser');
-const { addUserValues, addAppointmentValues, parseAppointment, updateUserValues, updateAppointmentValues } = require('./appointment.map');
+const { addAppointmentValues, parseAppointment, updateAppointmentValues, addUserValues, updateUserValues } = require('./appointment.map');
 const AppointmentQueries = require('./appointment.queries');
 const UserQueries = require('../user/user.queries');
 const UbigeoQueries = require('../ubigeo/ubigeo.queries');

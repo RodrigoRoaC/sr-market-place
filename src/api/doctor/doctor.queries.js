@@ -24,6 +24,62 @@ const list = (whereParams) =>
     doctores.fec_actualizacion desc
 `;
 
+const getEspecialidades = `SELECT * FROM especialidad`;
+
+const getVentanaHoraria = 
+`
+  SELECT 
+    cod_vent_horaria,
+    hora_inicio || ' - ' || hora_fin as "horario"
+  FROM 
+    ventana_horaria;
+`;
+
+const register = 
+`
+  INSERT INTO 
+    doctores(
+      cod_doctor,
+      cod_usuario,
+      cod_especialidad,
+      flag_activo,
+      fec_registro,
+      fec_actualizacion
+    )
+  VALUES
+    (
+      nextval('seq_cod_doctor'),
+      $1,
+      $2,
+      '1',
+      CURRENT_TIMESTAMP,
+      CURRENT_TIMESTAMP
+    ) RETURNING cod_doctor
+`;
+
+const update = 
+`
+  UPDATE
+    doctores
+  SET
+    cod_especialidad = $1,
+    flag_activo = $2,
+    fec_actualizacion = $3
+  WHERE
+    cod_doctor = $4
+`;
+
+const registerAvailability = 
+`
+  SELECT
+    public.sp_getcapacitybetweendates($1, $2::date, $3::date, $4, $5);
+`
+
 module.exports = {
   list,
+  getVentanaHoraria,
+  getEspecialidades,
+  register,
+  update,
+  registerAvailability,
 }

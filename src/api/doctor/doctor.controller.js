@@ -1,5 +1,6 @@
 const { request, response } = require('express');
-const { Ok, BadRequest, BDError } = require("../../helpers/http.helper");
+const { Ok, BadRequest, BDError, Forbidden } = require("../../helpers/http.helper");
+const { toComboData } = require('../../utils/parser');
 const DoctorService = require('./doctor.service');
 
 class DoctorController {
@@ -17,11 +18,11 @@ class DoctorController {
     if (!body) {
       return BadRequest(res, { message: 'You must provide a body' });
     }
-    if (!body.cod_usuario) {
+    if (!body.cod_resp) {
       return Forbidden(res, { message: 'You must be a valid user' });
     }
 
-    const { error, details, data } = await DoctorService.add(body);
+    const { error, details, data } = await DoctorService.register(body);
     if (error) {
       return BDError(res, details);
     }
@@ -77,6 +78,24 @@ class DoctorController {
     }
 
     return Ok(res, { data });
+  }
+
+  async getVentanaHoraria(req = request, res = response) {
+    const { error, details, data} = await DoctorService.getVentanaHoraria();
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, toComboData(data, 'cod_vent_horaria', 'horario'));
+  }
+
+  async getEspecialidades(req = request, res = response) {
+    const { error, details, data} = await DoctorService.getEspecialidades();
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, toComboData(data, 'cod_especialidad', 'descripcion'));
   }
 }
 

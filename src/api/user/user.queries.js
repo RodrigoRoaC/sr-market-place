@@ -27,9 +27,10 @@ const update =
     direccion = $9, 
     telefono1 = $10, 
     telefono2 = $11,
+    username = $12, 
     fec_actualizacion = CURRENT_TIMESTAMP
   WHERE 
-    cod_usuario = $12
+    cod_usuario = $13
 `;
 
 const register = 
@@ -50,6 +51,7 @@ const register =
       direccion, 
       telefono1, 
       telefono2, 
+      username,
       cod_perfil, 
       fec_registro, 
       fec_actualizacion
@@ -69,6 +71,7 @@ const register =
     $11, 
     $12, 
     $13, 
+    $14,
     7, 
     CURRENT_TIMESTAMP, 
     CURRENT_TIMESTAMP

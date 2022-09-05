@@ -1,6 +1,7 @@
 const postgresql = require('../../database/postgresql');
 const Utils = require('../../utils/parser');
 const UserQueries = require('../user/user.queries');
+const { addUserValues, updateUserValues } = require('./user.map');
 
 async function getOperators() {
   const client = await postgresql.getConnectionClient();
@@ -61,8 +62,38 @@ async function updateUserPayment({ nombres, ape_paterno, ape_materno, email, cod
   }
 }
 
+async function register(payload) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const operatorsRes = await client.query(UserQueries.register, addUserValues(payload));
+
+    return { data: operatorsRes.rows[0] };
+  } catch(err) {
+    console.log(err);
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
+async function update(payload) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const operatorsRes = await client.query(UserQueries.update, updateUserValues(payload));
+
+    return { data: operatorsRes.rows[0] };
+  } catch(err) {
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   getOperators,
   getPatientByUserCode,
   updateUserPayment,
+  register,
+  update,
 }
