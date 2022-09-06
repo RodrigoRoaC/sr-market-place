@@ -13,6 +13,16 @@ class DoctorController {
     return Ok(res, data);
   }
 
+  async getDoctor(req = request, res = response) {
+    const cod_doctor = +req.params.id;
+    const { error, details, data } = await DoctorService.getDoctor(cod_doctor);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
+
   async register(req = request, res = response) {
     const body = req.body;
     if (!body) {
@@ -35,7 +45,7 @@ class DoctorController {
     if (!body) {
       return BadRequest(res, { message: 'You must provide a body' });
     }
-    if (!body.cod_usuario) {
+    if (!body.cod_resp) {
       return Forbidden(res, { message: 'You must be a valid user' });
     }
 
@@ -96,6 +106,20 @@ class DoctorController {
     }
 
     return Ok(res, toComboData(data, 'cod_especialidad', 'descripcion'));
+  }
+
+  async getVentanaHorariaByDate(req = request, res = response) {
+    const { cod_doctor, fecha_reserva } = req.query;
+    if (!cod_doctor || !fecha_reserva) {
+      return BadRequest(res, { message: 'You must provide a doctor and a date'});
+    }
+
+    const { error, details, data } = await DoctorService.getVentanaHorariaByDate({ cod_doctor, fecha_reserva });
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, toComboData(data, 'cod_vent_horaria', 'horario'));
   }
 }
 

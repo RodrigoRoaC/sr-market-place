@@ -32,8 +32,17 @@ const addAvaValues = ({
   cod_resp,
 ])
 
+const getVenHorariaValues = ({
+  cod_doctor,
+  fecha_reserva
+}) => ([
+  +cod_doctor,
+  fecha_reserva,
+]);
+
 module.exports = {
   addDoctorValues,
   updateDoctorValues,
   addAvaValues,
+  getVenHorariaValues,
 }

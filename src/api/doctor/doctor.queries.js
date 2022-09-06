@@ -75,6 +75,25 @@ const registerAvailability =
     public.sp_getcapacitybetweendates($1, $2::date, $3::date, $4, $5);
 `
 
+const getVentanaHorariaByDate = 
+`
+  SELECT 
+    ventana_horaria.cod_vent_horaria,
+    ventana_horaria.hora_inicio || ' - ' || ventana_horaria.hora_fin as "horario",
+    disponibilidad.flag_disponible
+  FROM 
+    disponibilidad
+  INNER JOIN 
+    ventana_horaria ON ventana_horaria.cod_vent_horaria = disponibilidad.cod_vent_horaria
+  WHERE 
+    cod_doctor = $1 AND flag_disponible = '1' AND fecha_reserva = $2;
+`;
+
+const deleteAvailabilityByDate = 
+`
+  DELETE FROM disponibilidad WHERE cod_doctor = $1 AND fecha_reserva = $2;
+`;
+
 module.exports = {
   list,
   getVentanaHoraria,
@@ -82,4 +101,6 @@ module.exports = {
   register,
   update,
   registerAvailability,
+  getVentanaHorariaByDate,
+  deleteAvailabilityByDate,
 }
