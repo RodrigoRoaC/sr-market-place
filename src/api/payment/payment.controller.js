@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BDError, BadRequest, ExternalServiceError } = require("../../helpers/http.helper");
+const { Ok, BDError, BadRequest, ExternalServiceError } = require('../../helpers/http.helper');
 const { sendEmail } = require('../../services/node-mailer');
 const UserService = require('../user/user.service');
 const PaymentService = require('./payment.service');

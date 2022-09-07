@@ -1,4 +1,4 @@
-const { Ok } = require("../../helpers/http.helper");
+const { Ok } = require('../../helpers/http.helper');
 
 class HealthController {
   async health(req, res) {

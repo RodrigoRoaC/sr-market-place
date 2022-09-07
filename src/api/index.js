@@ -4,6 +4,7 @@ const auth = require('./auth/auth.route');
 const doctor = require('./doctor/doctor.route');
 const health = require('./health/health.route');
 const payment = require('./payment/payment.route');
+const requestAppointment = require('./request-appointment/request-appointment.route');
 const user = require('./user/user.route');
 const ubigeo = require('./ubigeo/ubigeo.route');
 
@@ -14,6 +15,7 @@ router.use('/appointment', appointment);
 router.use('/auth', auth);
 router.use('/doctor', doctor);
 router.use('/payment', payment);
+router.use('/request-appointment', requestAppointment);
 router.use('/ubigeo', ubigeo);
 router.use('/user', user);
 

@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BadRequest, BDError, Forbidden } = require("../../helpers/http.helper");
+const { Ok, BadRequest, BDError, Forbidden } = require('../../helpers/http.helper');
 const { toComboData } = require('../../utils/parser');
 const DoctorService = require('./doctor.service');
 

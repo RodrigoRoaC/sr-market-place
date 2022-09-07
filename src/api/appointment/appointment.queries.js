@@ -1,128 +1,84 @@
-const getAppointmentBy = (whereParams) =>
-`
-  SELECT 
-    solicitud.cod_solicitud,
-    solicitud.cod_usuario,
-    solicitud.cod_estado,
-    estados.descripcion,
-    solicitud.cod_tipo_atencion,
-    solicitud.cod_tipo_servicio,
-    solicitud.cod_modalidad,
-    pacientes.cod_plan,
-    planes_salud.cod_iafa,
-    
-    solicitud.fecha_programacion,
-    solicitud.hora_programacion,
-    solicitud.sintomas,
-    solicitud.diagnostico,
-    pacientes.cod_paciente,
-    
-    usuarios.nombres,
-    usuarios.ape_paterno,
-    usuarios.ape_materno,
-    usuarios.fec_nacimiento,
-    usuarios.cod_tipo_doc,
-    usuarios.num_documento,
-    usuarios.departamento,
-    usuarios.provincia,
-    usuarios.distrito,
-    usuarios.direccion,
-    usuarios.email,
-    usuarios.telefono1,
-    usuarios.telefono2
-  FROM 
-    solicitud
-  INNER JOIN
-    pacientes ON pacientes.cod_paciente = solicitud.cod_paciente
-  INNER JOIN 
-    usuarios ON usuarios.cod_usuario = pacientes.cod_usuario
-  INNER JOIN
-    estados ON estados.cod_estado = solicitud.cod_estado
-  LEFT JOIN 
-    planes_salud ON planes_salud.cod_plan = pacientes.cod_plan
-  WHERE solicitud.cod_estado != 5 ${whereParams ? `AND ${whereParams}` : ''}
-  ORDER BY
-    solicitud.fec_actualizacion desc
-`;
-
-const insert = 
+const register = 
 `
   INSERT INTO 
-    solicitud(
-      cod_solicitud, 
-      cod_paciente, 
-      cod_usuario, 
-      cod_tipo_atencion, 
-      cod_tipo_servicio, 
-      cod_modalidad, 
-      cod_estado, 
-      sintomas, 
-      diagnostico, 
-      fecha_programacion, 
-      hora_programacion, 
+    citas(
+      cod_cita,
+      cod_solicitud,
+      cod_doctor,
+      cod_usuario,
+      cod_estado,
+      observaciones,
+      fecha_cancelacion,
       fec_registro, 
       fec_actualizacion
     )
-  VALUES(
-    nextval('seq_cod_solicitud'), 
-    $1, 
-    $2, 
-    $3, 
-    $4, 
-    $5, 
-    2, 
-    $6, 
-    $7, 
-    $8, 
-    $9, 
-    CURRENT_TIMESTAMP, 
-    CURRENT_TIMESTAMP
-  ) RETURNING cod_solicitud
+  VALUES
+    (
+      nextval('seq_cod_cita'), 
+      $1, 
+      $2, 
+      $3, 
+      $4, 
+      $5, 
+      NULL, 
+      CURRENT_TIMESTAMP, 
+      CURRENT_TIMESTAMP
+    )
+  RETURNING cod_cita;
 `;
 
-const update = 
+const getAppointments = (whereParams, orderBy) => 
 `
-  UPDATE 
-    solicitud
-  SET 
-    cod_tipo_atencion = $1, 
-    cod_tipo_servicio = $2, 
-    cod_modalidad = $3, 
-    sintomas = $4, 
-    diagnostico = $5, 
-    fecha_programacion = $6, 
-    hora_programacion = $7, 
-    fec_actualizacion = $8,
-    cod_estado = 2
+  SELECT
+    c.cod_cita,
+    s.sintomas,
+    s.diagnostico,
+    s.fecha_programacion,
+    c.observaciones,
+    c.cod_estado,
+    c.cod_doctor,
+    u1.nombres || ' ' || u1.ape_paterno as nombres_doctor,
+    e.descripcion as especialidad,
+    ta.descripcion as tipo_atencion,
+    s.cod_paciente,
+    u2.nombres || ' ' || u2.ape_paterno as nombres_paciente,
+    u2.telefono1,
+    u2.email,
+    td.desc_corta as tipo_documento,
+    u2.num_documento,
+    hr.cod_disponibilidad,
+    ds.flag_disponible,
+    vh.hora_inicio || ' - ' || vh.hora_fin as horario
+  FROM 
+    citas c
+  INNER JOIN 
+    solicitud s ON s.cod_solicitud = c.cod_solicitud
+  INNER JOIN 
+    doctores d ON d.cod_doctor = c.cod_doctor
+  INNER JOIN 
+    usuarios u1 ON u1.cod_usuario = d.cod_usuario
+  LEFT JOIN 
+    especialidad e ON e.cod_especialidad = d.cod_especialidad
+  LEFT JOIN 
+    tipo_atencion ta ON ta.cod_tipo_atencion = d.cod_tipo_atencion
+  INNER JOIN 
+    pacientes p ON p.cod_paciente = s.cod_paciente
+  INNER JOIN 
+    usuarios u2 ON u2.cod_usuario = p.cod_usuario
+  LEFT JOIN 
+    tipo_documento td ON td.cod_tipo_doc = u2.cod_tipo_doc
+  INNER JOIN 
+    horarios_reserva hr ON hr.cod_cita = c.cod_cita
+  INNER JOIN 
+    disponibilidad ds ON ds.cod_disponibilidad = hr.cod_disponibilidad
+  INNER JOIN 
+    ventana_horaria vh ON vh.cod_vent_horaria = ds.cod_vent_horaria
   WHERE 
-    cod_solicitud = $9
-`;
-
-const remove = 
-`
-  UPDATE 
-    solicitud 
-  SET 
-    cod_estado = 5 
-  WHERE 
-    cod_solicitud = $1
-`;
-
-const assignTo = 
-`
-  UPDATE 
-    solicitud 
-  SET 
-    cod_usuario = $1,
-    fec_actualizacion = $2
-  WHERE 
-    cod_solicitud = $3
+    c.cod_estado <> 5 ${whereParams ? `AND ${whereParams}` : ''} 
+  ${orderBy ? `ORDER BY ${orderBy}` : ''}
 `;
 
 module.exports = {
-  getAppointmentBy,
-  insert,
-  update,
-  remove,
-  assignTo,
+  register,
+  getAppointments,
 }

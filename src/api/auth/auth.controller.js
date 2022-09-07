@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BadRequest, BDError, NotFound } = require("../../helpers/http.helper");
+const { Ok, BadRequest, BDError, NotFound } = require('../../helpers/http.helper');
 const { parseUserAuthResponse } = require('./auth.map');
 const AuthService = require('./auth.service');
 

@@ -5,11 +5,8 @@ const Controller = require('./appointment.controller');
 const router = Router();
 const controller = new Controller();
 
-router.get('/:operatorId', catchError(controller.list));
-router.get('/combo/get-data', catchError(controller.getComboData));
-router.post('/register', catchError(controller.register));
-router.put('/update', catchError(controller.update));
-router.post('/assign-operator', catchError(controller.assignToOperator));
-router.post('/remove', catchError(controller.delete));
+router.get('/', catchError(controller.list));
+router.post('/', catchError(controller.register));
+router.get('/:id', catchError(controller.getByDoctor));
 
 module.exports = router;

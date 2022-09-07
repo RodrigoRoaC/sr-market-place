@@ -10,10 +10,17 @@ const toComboData = (array = [], id, descriptcion) => array.map(a => ({
 
 const parseAvailabilityDates = (dates = []) => [parseDateToString(dates[0]), parseDateToString(dates[1])];
 
+const dateToISOString = () => {
+  const [day, month, year] = new Date().toLocaleDateString().split('/');
+
+  return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
+};
+
 module.exports = {
   parseDate,
   parseTime,
   toComboData,
   parseDateToString,
   parseAvailabilityDates,
+  dateToISOString,
 }

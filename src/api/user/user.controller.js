@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BDError } = require("../../helpers/http.helper");
+const { Ok, BDError } = require('../../helpers/http.helper');
 const UserService = require('./user.service');
 
 class UserController {
