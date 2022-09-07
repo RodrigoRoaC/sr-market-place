@@ -36,6 +36,7 @@ const getAppointments = (whereParams, orderBy) =>
     s.fecha_programacion,
     c.observaciones,
     c.cod_estado,
+    est.descripcion,
     c.cod_doctor,
     u1.nombres || ' ' || u1.ape_paterno as nombres_doctor,
     e.descripcion as especialidad,
@@ -48,6 +49,7 @@ const getAppointments = (whereParams, orderBy) =>
     u2.num_documento,
     hr.cod_disponibilidad,
     ds.flag_disponible,
+    ds.fecha_reserva,
     vh.hora_inicio || ' - ' || vh.hora_fin as horario
   FROM 
     citas c
@@ -61,6 +63,8 @@ const getAppointments = (whereParams, orderBy) =>
     especialidad e ON e.cod_especialidad = d.cod_especialidad
   LEFT JOIN 
     tipo_atencion ta ON ta.cod_tipo_atencion = d.cod_tipo_atencion
+  INNER JOIN
+    estados est ON est.cod_estado = c.cod_estado
   INNER JOIN 
     pacientes p ON p.cod_paciente = s.cod_paciente
   INNER JOIN 

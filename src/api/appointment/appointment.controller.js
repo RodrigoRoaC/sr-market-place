@@ -1,6 +1,7 @@
 const { request, response } = require('express');
-const { Ok, BadRequest, BDError } = require('../../helpers/http.helper');
+const { Ok, BadRequest, BDError, NotFound } = require('../../helpers/http.helper');
 const ParseUtils = require('../../utils/parser');
+const DoctorService = require('../doctor/doctor.service');
 const AppointmentService = require('./appointment.service');
 
 class AppointmentController {
@@ -15,13 +16,22 @@ class AppointmentController {
   }
 
   async getByDoctor(req = request, res = response) {
-    const cod_doctor = +req.params.id;
+    const cod_usuario = +req.params.id;
     const fecha_reserva = req.query.fecha_reserva || ParseUtils.dateToISOString();
-    if (!cod_doctor) {
-      return BadRequest(res, { message: 'You need to provide a cod_doctor' });
+    if (!cod_usuario) {
+      return BadRequest(res, { message: 'You need to provide a cod_usuario' });
     }
 
-    const { error, details, data } = await AppointmentService.getAppointmentsBy({ cod_doctor, fecha_reserva });
+    const { error: err, details: dt, data: doctor } = await DoctorService.getDoctor(cod_usuario);
+    if (err) {
+      return BDError(res, dt);
+    }
+
+    if (!doctor) {
+      return NotFound(res, { message: 'Doctor not found' });
+    }
+
+    const { error, details, data } = await AppointmentService.getAppointmentsBy({ cod_doctor: doctor.cod_doctor, fecha_reserva });
     if (error) {
       return BDError(res, details);
     }
