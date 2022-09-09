@@ -40,9 +40,12 @@ const getVenHorariaValues = ({
   fecha_reserva,
 ]);
 
+const parseDoctor = (doctores = []) => doctores.map(doc => ({ ...doc, nombres_doctor: `${doc.nombres} ${doc.ape_paterno}` }));
+
 module.exports = {
   addDoctorValues,
   updateDoctorValues,
   addAvaValues,
   getVenHorariaValues,
+  parseDoctor,
 }

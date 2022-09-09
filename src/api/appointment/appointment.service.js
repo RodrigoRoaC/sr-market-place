@@ -1,5 +1,5 @@
 const postgresql = require('../../database/postgresql');
-const { addAppointmentValues } = require('./appointment.map');
+const { addAppointmentValues, updateAppointmentValues } = require('./appointment.map');
 const AppointmentQueries = require('./appointment.queries');
 
 async function getAppointments({ fecha_programacion }) {
@@ -66,8 +66,37 @@ async function register(payload) {
   }
 }
 
+async function update(payload) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    await client.query('BEGIN');
+
+    const appointmentAdded = await client.query(
+      AppointmentQueries.update,
+      updateAppointmentValues(payload)
+    );
+
+    const appointmentData = await client.query(
+      AppointmentQueries.getAppointments('c.cod_cita = $1'), 
+      [appointmentAdded.rows[0].cod_cita]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: appointmentData.rows[0] };
+  } catch(err) {
+    await client.query('ROLLBACK');
+    console.error('An error occurred while getAppointments', err);
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   getAppointments,
   getAppointmentsBy,
   register,
+  update,
 }

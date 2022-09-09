@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const { Ok, BadRequest, BDError, Forbidden } = require('../../helpers/http.helper');
 const { toComboData } = require('../../utils/parser');
+const { parseDoctor } = require('./doctor.map');
 const DoctorService = require('./doctor.service');
 
 class DoctorController {
@@ -120,6 +121,20 @@ class DoctorController {
     }
 
     return Ok(res, toComboData(data, 'cod_vent_horaria', 'horario'));
+  }
+
+  async getComboDoctorBy(req = request, res = response) {
+    const { cod_especialidad, cod_tipo_atencion } = req.query;
+    if (!cod_especialidad || !cod_tipo_atencion) {
+      return BadRequest(res, { message: 'You must provide an specialty and an atention'});
+    }
+
+    const { error, details, data } = await DoctorService.getComboDoctor(+cod_especialidad, +cod_tipo_atencion);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, toComboData(parseDoctor(data), 'cod_doctor', 'nombres_doctor'));
   }
 }
 

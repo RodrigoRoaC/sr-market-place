@@ -150,9 +150,27 @@ async function update(payload) {
   }
 }
 
+async function getComboDoctor(cod_especialidad, cod_tipo_atencion) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const doctors = await client.query(
+      DoctorQueries.list(`especialidad.cod_especialidad = ${cod_especialidad} AND doctores.cod_tipo_atencion = ${cod_tipo_atencion}`)
+    );
+
+    return { data: doctors.rows };
+  } catch(err) {
+    console.error('An error occurred while fetching', err);
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   list,
   getDoctor,
+  getComboDoctor,
   getVentanaHoraria,
   getVentanaHorariaByDate,
   getEspecialidades,

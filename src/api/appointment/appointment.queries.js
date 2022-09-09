@@ -1,30 +1,11 @@
 const register = 
 `
-  INSERT INTO 
-    citas(
-      cod_cita,
-      cod_solicitud,
-      cod_doctor,
-      cod_usuario,
-      cod_estado,
-      observaciones,
-      fecha_cancelacion,
-      fec_registro, 
-      fec_actualizacion
-    )
-  VALUES
-    (
-      nextval('seq_cod_cita'), 
-      $1, 
-      $2, 
-      $3, 
-      $4, 
-      $5, 
-      NULL, 
-      CURRENT_TIMESTAMP, 
-      CURRENT_TIMESTAMP
-    )
-  RETURNING cod_cita;
+  SELECT public.sp_insertAppointment($1, $2, $3, $4, $5, $6);
+`;
+
+const update = 
+`
+  SELECT public.sp_updateDateAppointment($1, $2, $3, $4, $5, $6);
 `;
 
 const getAppointments = (whereParams, orderBy) => 
@@ -39,7 +20,9 @@ const getAppointments = (whereParams, orderBy) =>
     est.descripcion,
     c.cod_doctor,
     u1.nombres || ' ' || u1.ape_paterno as nombres_doctor,
+    e.cod_especialidad,
     e.descripcion as especialidad,
+    ta.cod_tipo_atencion,
     ta.descripcion as tipo_atencion,
     s.cod_paciente,
     u2.nombres || ' ' || u2.ape_paterno as nombres_paciente,
@@ -84,5 +67,6 @@ const getAppointments = (whereParams, orderBy) =>
 
 module.exports = {
   register,
+  update,
   getAppointments,
 }

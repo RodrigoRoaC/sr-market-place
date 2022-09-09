@@ -48,6 +48,16 @@ class AppointmentController {
 
     return Ok(res, data);
   }
+
+  async update(req = request, res = response) {
+    const body = req.body;
+    const { error, details, data } = await AppointmentService.update(body);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
 }
 
 module.exports = AppointmentController;
