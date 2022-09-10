@@ -1,11 +1,11 @@
 const register = 
 `
-  SELECT public.sp_insertAppointment($1, $2, $3, $4, $5, $6);
+  SELECT public.sp_insertappointment($1, $2, $3, $4, $5::date, $6);
 `;
 
 const update = 
 `
-  SELECT public.sp_updateDateAppointment($1, $2, $3, $4, $5, $6);
+  SELECT public.sp_updatedateappointment($1, $2, $3::date, $4, $5, $6);
 `;
 
 const getAppointments = (whereParams, orderBy) => 
@@ -33,6 +33,7 @@ const getAppointments = (whereParams, orderBy) =>
     hr.cod_disponibilidad,
     ds.flag_disponible,
     ds.fecha_reserva,
+    vh.cod_vent_horaria,
     vh.hora_inicio || ' - ' || vh.hora_fin as horario
   FROM 
     citas c

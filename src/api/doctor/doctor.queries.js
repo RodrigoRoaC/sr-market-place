@@ -11,6 +11,8 @@ const list = (whereParams) =>
     usuarios.cod_tipo_doc,
     usuarios.num_documento,
     doctores.cod_especialidad,
+    tipo_atencion.cod_tipo_atencion,
+    tipo_atencion.descripcion as atencion,
     especialidad.descripcion AS "especialidad",
     doctores.flag_activo
   FROM 
@@ -19,6 +21,8 @@ const list = (whereParams) =>
     usuarios ON usuarios.cod_usuario = doctores.cod_usuario
   INNER JOIN
     especialidad ON especialidad.cod_especialidad = doctores.cod_especialidad
+  INNER JOIN
+    tipo_atencion ON tipo_atencion.cod_tipo_atencion = doctores.cod_tipo_atencion
   ${whereParams ? `WHERE ${whereParams}` : ''}
   ORDER BY
     doctores.fec_actualizacion desc

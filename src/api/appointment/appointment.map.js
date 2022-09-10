@@ -1,3 +1,5 @@
+const { parseDateToString } = require("../../utils/parser");
+
 const addAppointmentValues = ({
   cod_solicitud = null,
   cod_doctor = null,
@@ -24,7 +26,7 @@ const updateAppointmentValues = ({
 }) => ([
   cod_cita,
   cod_doctor,
-  fecha_reserva,
+  parseDateToString(fecha_reserva),
   cod_vent_horaria,
   cod_usuario,
   observaciones,
