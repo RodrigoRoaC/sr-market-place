@@ -29,7 +29,12 @@ const getAppointmentBy = (whereParams) =>
     usuarios.direccion,
     usuarios.email,
     usuarios.telefono1,
-    usuarios.telefono2
+    usuarios.telefono2,
+
+    citas.cod_cita,
+    especialidad.cod_especialidad,
+    disponibilidad.cod_vent_horaria,
+    doctores.cod_doctor
   FROM 
     solicitud
   INNER JOIN
@@ -40,6 +45,16 @@ const getAppointmentBy = (whereParams) =>
     estados ON estados.cod_estado = solicitud.cod_estado
   LEFT JOIN 
     planes_salud ON planes_salud.cod_plan = pacientes.cod_plan
+  INNER JOIN
+  	citas ON citas.cod_solicitud = solicitud.cod_solicitud
+  INNER JOIN
+  	horarios_reserva ON horarios_reserva.cod_cita = citas.cod_cita
+  INNER JOIN
+    disponibilidad ON disponibilidad.cod_disponibilidad = horarios_reserva.cod_disponibilidad
+  INNER JOIN 
+  	doctores ON doctores.cod_doctor = citas.cod_doctor
+  LEFT JOIN
+    especialidad ON especialidad.cod_especialidad = doctores.cod_especialidad
   WHERE solicitud.cod_estado != 5 ${whereParams ? `AND ${whereParams}` : ''}
   ORDER BY
     solicitud.fec_actualizacion desc

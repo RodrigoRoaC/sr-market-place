@@ -12,7 +12,7 @@ const addAppointmentValues = ({
   cod_doctor,
   cod_usuario,
   observaciones,
-  fecha_reserva,
+  parseDateToString(fecha_reserva),
   cod_vent_horaria,
 ]);
 

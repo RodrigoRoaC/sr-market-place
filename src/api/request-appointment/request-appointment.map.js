@@ -14,7 +14,7 @@ const parseAppointment = ({
   hora_programacion: parseTime(hora_programacion),
 });
 
-const addAppointmentValues = ({
+const addReqAppointmentValues = ({
   cod_paciente = null,
   cod_usuario = null,
   cod_tipo_atencion = null,
@@ -36,7 +36,7 @@ const addAppointmentValues = ({
   hora_programacion,
 ]);
 
-const updateAppointmentValues = ({
+const updateReqAppointmentValues = ({
   cod_solicitud,
   cod_tipo_atencion = null,
   cod_tipo_servicio = null,
@@ -58,7 +58,7 @@ const updateAppointmentValues = ({
 ]);
 
 module.exports = {
-  addAppointmentValues,
+  addReqAppointmentValues,
   parseAppointment,
-  updateAppointmentValues,
+  updateReqAppointmentValues,
 }

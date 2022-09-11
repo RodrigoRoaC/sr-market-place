@@ -1,16 +1,18 @@
 const postgresql = require('../../database/postgresql');
 const { toComboData } = require('../../utils/parser');
-const { addAppointmentValues, parseAppointment, updateAppointmentValues } = require('./request-appointment.map');
-const AppointmentQueries = require('./request-appointment.queries');
+const { addReqAppointmentValues, parseAppointment, updateReqAppointmentValues } = require('./request-appointment.map');
+const AppointmentQueries = require('../appointment/appointment.queries');
+const ReqAppointmentQueries = require('./request-appointment.queries');
 const UserQueries = require('../user/user.queries');
 const UbigeoQueries = require('../ubigeo/ubigeo.queries');
 const { addUserValues, updateUserValues } = require('../user/user.map');
+const { addAppointmentValues, updateAppointmentValues } = require('../appointment/appointment.map');
 
 async function getByOperatorId(id) {
   const client = await postgresql.getConnectionClient();
   try {
     const appointments = await client.query(
-      AppointmentQueries.getAppointmentBy('solicitud.cod_usuario = $1'), 
+      ReqAppointmentQueries.getAppointmentBy('solicitud.cod_usuario = $1'), 
       [id]
     );
 
@@ -44,10 +46,17 @@ async function add(appointment) {
       cod_paciente = newPatient.rows[0].cod_paciente;
     }
 
-    const newSolicitud = await client.query(AppointmentQueries.insert, addAppointmentValues({ ...formatAppointment, cod_paciente }));
+    const newSolicitud = await client.query(ReqAppointmentQueries.insert, addReqAppointmentValues({ ...formatAppointment, cod_paciente }));
+
+    await client.query(AppointmentQueries.register, addAppointmentValues({
+      ...appointment,
+      observaciones: appointment.sintomas,
+      cod_solicitud: newSolicitud.rows[0].cod_solicitud,
+      fecha_reserva: appointment.fecha_programacion,
+    }));
 
     const appointments = await client.query(
-      AppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
+      ReqAppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
       [newSolicitud.rows[0].cod_solicitud]
     );
 
@@ -87,10 +96,16 @@ async function update(appointment) {
 
     await client.query(UserQueries.update, updateUserValues({ ...appointment, cod_usuario: codPatientUser }));
 
-    await client.query(AppointmentQueries.update, updateAppointmentValues(formatAppointment));
+    await client.query(ReqAppointmentQueries.update, updateReqAppointmentValues(formatAppointment));
+
+    await client.query(AppointmentQueries.update, updateAppointmentValues({
+      ...appointment,
+      observaciones: appointment.sintomas,
+      fecha_reserva: appointment.fecha_programacion,
+    }));
 
     const appointments = await client.query(
-      AppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
+      ReqAppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
       [appointment.cod_solicitud]
     );
 
@@ -111,7 +126,7 @@ async function assignToOperator(assignObj) {
   try {
     await client.query('BEGIN');
 
-    await client.query(AppointmentQueries.assignTo, [assignObj.cod_usuario, new Date(), assignObj.cod_solicitud]);
+    await client.query(ReqAppointmentQueries.assignTo, [assignObj.cod_usuario, new Date(), assignObj.cod_solicitud]);
 
     await client.query('COMMIT');
 
@@ -162,7 +177,7 @@ async function remove(body) {
   try {
     await client.query('BEGIN');
 
-    await client.query(AppointmentQueries.remove, [body.cod_solicitud]);
+    await client.query(ReqAppointmentQueries.remove, [body.cod_solicitud]);
 
     await client.query('COMMIT');
 
