@@ -34,7 +34,8 @@ const getAppointmentBy = (whereParams) =>
     citas.cod_cita,
     especialidad.cod_especialidad,
     disponibilidad.cod_vent_horaria,
-    doctores.cod_doctor
+    doctores.cod_doctor,
+    ventana_horaria.hora_inicio || ' - ' || ventana_horaria.hora_fin as horario
   FROM 
     solicitud
   INNER JOIN
@@ -55,6 +56,8 @@ const getAppointmentBy = (whereParams) =>
   	doctores ON doctores.cod_doctor = citas.cod_doctor
   LEFT JOIN
     especialidad ON especialidad.cod_especialidad = doctores.cod_especialidad
+  INNER JOIN 
+    ventana_horaria ON ventana_horaria.cod_vent_horaria = disponibilidad.cod_vent_horaria
   WHERE solicitud.cod_estado != 5 ${whereParams ? `AND ${whereParams}` : ''}
   ORDER BY
     solicitud.fec_actualizacion desc
