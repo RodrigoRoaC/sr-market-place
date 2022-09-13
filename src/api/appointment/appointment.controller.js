@@ -58,6 +58,16 @@ class AppointmentController {
 
     return Ok(res, data);
   }
+
+  async cancel(req = request, res = response) {
+    const body = req.body;
+    const { error, details, data } = await AppointmentService.cancel(body);
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
 }
 
 module.exports = AppointmentController;

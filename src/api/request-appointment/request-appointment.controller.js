@@ -1,6 +1,7 @@
 const { request, response } = require('express');
 const { Ok, BadRequest, BDError } = require('../../helpers/http.helper');
-const AppointmentService = require('./request-appointment.service');
+const ReqAppointmentService = require('./request-appointment.service');
+const AppointmentService = require('../appointment/appointment.service');
 
 class AppointmentController {
   async list(req = request, res = response) {
@@ -9,7 +10,7 @@ class AppointmentController {
       return BadRequest(res, { message: 'You must provide an operator identifier' });
     }
 
-    const { error, data } = await AppointmentService.getByOperatorId(operatorId);
+    const { error, data } = await ReqAppointmentService.getByOperatorId(operatorId);
     if (error) {
       return BDError(res, error);
     }
@@ -26,7 +27,7 @@ class AppointmentController {
       return Forbidden(res, { message: 'You must be a valid user' });
     }
 
-    const { error, details, data } = await AppointmentService.add(body);
+    const { error, details, data } = await ReqAppointmentService.add(body);
     if (error) {
       return BDError(res, details);
     }
@@ -43,7 +44,7 @@ class AppointmentController {
       return Forbidden(res, { message: 'You must be a valid user' });
     }
 
-    const { error, details, data } = await AppointmentService.update(body);
+    const { error, details, data } = await ReqAppointmentService.update(body);
     if (error) {
       return BDError(res, details);
     }
@@ -57,7 +58,7 @@ class AppointmentController {
       return BadRequest(res, { message: 'You must provide a body' });
     }
 
-    const { error, details, data } = await AppointmentService.assignToOperator(body);
+    const { error, details, data } = await ReqAppointmentService.assignToOperator(body);
     if (error) {
       return BDError(res, details);
     }
@@ -66,7 +67,7 @@ class AppointmentController {
   }
 
   async getComboData(req = request, res = response) {
-    const { error, details, data } = await AppointmentService.getComboData();
+    const { error, details, data } = await ReqAppointmentService.getComboData();
     if (error) {
       return BDError(res, details);
     }
@@ -76,11 +77,15 @@ class AppointmentController {
 
   async delete(req = request, res = response) {
     const body = req.body;
-    const { error, details, data } = await AppointmentService.remove(body);
+    const { error: err, details: det } = await AppointmentService.cancel(body);
+    if (err) {
+      return BDError(res, det);
+    }
+
+    const { error, details, data } = await ReqAppointmentService.remove(body);
     if (error) {
       return BDError(res, details);
     }
-
     return Ok(res, { data });
   }
 }
