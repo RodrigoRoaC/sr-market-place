@@ -8,6 +8,11 @@ const update =
   SELECT public.sp_updatedateappointment($1, $2, $3::date, $4, $5, $6);
 `;
 
+const close =
+`
+  SELECT public.sp_closeAppointment($1, $2);
+`;
+
 const getAppointments = (whereParams, orderBy) => 
 `
   SELECT
@@ -55,19 +60,20 @@ const getAppointments = (whereParams, orderBy) =>
     usuarios u2 ON u2.cod_usuario = p.cod_usuario
   LEFT JOIN 
     tipo_documento td ON td.cod_tipo_doc = u2.cod_tipo_doc
-  INNER JOIN 
+  LEFT JOIN 
     horarios_reserva hr ON hr.cod_cita = c.cod_cita
-  INNER JOIN 
+  LEFT JOIN 
     disponibilidad ds ON ds.cod_disponibilidad = hr.cod_disponibilidad
-  INNER JOIN 
+  LEFT JOIN 
     ventana_horaria vh ON vh.cod_vent_horaria = ds.cod_vent_horaria
   WHERE 
-    c.cod_estado <> 5 ${whereParams ? `AND ${whereParams}` : ''} 
+    c.cod_estado <> 10 ${whereParams ? `AND ${whereParams}` : ''} 
   ${orderBy ? `ORDER BY ${orderBy}` : ''}
 `;
 
 module.exports = {
   register,
   update,
+  close,
   getAppointments,
 }

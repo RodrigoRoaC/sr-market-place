@@ -2,12 +2,11 @@ const postgresql = require('../../database/postgresql');
 const { addAppointmentValues, updateAppointmentValues } = require('./appointment.map');
 const AppointmentQueries = require('./appointment.queries');
 
-async function getAppointments({ fecha_programacion }) {
+async function getAppointments() {
   const client = await postgresql.getConnectionClient();
   try {
     const appointmentData = await client.query(
-      AppointmentQueries.getAppointments(`s.fecha_programacion >= $1`, 's.fecha_programacion desc'),
-      [fecha_programacion]
+      AppointmentQueries.getAppointments(null, 's.fecha_programacion desc')
     );
 
     return { data: appointmentData.rows };
@@ -20,12 +19,12 @@ async function getAppointments({ fecha_programacion }) {
   }
 }
 
-async function getAppointmentsBy({ cod_doctor, fecha_reserva }) {
+async function getAppointmentsBy({ cod_doctor }) {
   const client = await postgresql.getConnectionClient();
   try {
     const appointmentData = await client.query(
-      AppointmentQueries.getAppointments(`c.cod_doctor = $1 AND ds.fecha_reserva >= $2`, 'ds.fecha_reserva desc'),
-      [cod_doctor, fecha_reserva]
+      AppointmentQueries.getAppointments(`c.cod_doctor = $1`, 'ds.fecha_reserva desc'),
+      [cod_doctor]
     );
 
     return { data: appointmentData.rows };
@@ -94,9 +93,38 @@ async function update(payload) {
   }
 }
 
+async function cancel(payload) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    await client.query('BEGIN');
+
+    const resp = await client.query(
+      AppointmentQueries.close,
+      [payload.cod_cita, payload.cod_usuario]
+    );
+      console.log(resp.rows);
+    const appointmentData = await client.query(
+      AppointmentQueries.getAppointments('c.cod_cita = $1'),
+      [payload.cod_cita]
+    );
+
+    await client.query('COMMIT');
+
+    return { data: appointmentData.rows[0] };
+  } catch(err) {
+    await client.query('ROLLBACK');
+    console.error('An error occurred while getAppointments', err);
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 module.exports = {
   getAppointments,
   getAppointmentsBy,
   register,
   update,
+  cancel,
 }
