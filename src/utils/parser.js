@@ -1,3 +1,5 @@
+const { indicatorColumns } = require("./excel-mapper");
+
 const parseDate = (date) => date ? new Date(date) : null;
 const parseTime = (time) => time ? new Date(time).toLocaleTimeString() : null;
 
@@ -16,6 +18,18 @@ const dateToISOString = () => {
   return `${year}-${month < 10 ? `0${month}` : month}-${day < 10 ? `0${day}` : day}`;
 };
 
+const arrayToIndicatorValues = (array) => {
+  const _array = Array.isArray(array) ? [...array] : [array];
+  const columns = _array[0].map(el => indicatorColumns[el]);
+  _array.shift();
+  return _array.map(
+    (data) => columns.reduce((acc, cur, index) => {
+      acc[cur] = data[index];
+      return acc;
+    }, {})
+  );
+};
+
 module.exports = {
   parseDate,
   parseTime,
@@ -23,4 +37,5 @@ module.exports = {
   parseDateToString,
   parseAvailabilityDates,
   dateToISOString,
+  arrayToIndicatorValues,
 }

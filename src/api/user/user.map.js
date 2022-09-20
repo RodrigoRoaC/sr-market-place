@@ -13,6 +13,7 @@ const addUserValues = ({
   telefono1 = null,
   telefono2 = null,
   username = null,
+  cod_perfil = 7,
 }) => ([
   cod_tipo_doc,
   num_documento,
@@ -28,6 +29,7 @@ const addUserValues = ({
   telefono1,
   telefono2,
   username,
+  cod_perfil,
 ]);
 
 const updateUserValues = ({

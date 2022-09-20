@@ -84,7 +84,7 @@ async function register(payload) {
   try {
     await client.query('BEGIN');
 
-    const userRes = await UserService.register(payload);
+    const userRes = await UserService.register({ ...payload, cod_perfil: 5, clave: payload.num_documento });
     if (userRes.error) {
       throw new Error('Error al registrar usuario');
     }

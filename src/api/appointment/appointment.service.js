@@ -70,14 +70,11 @@ async function update(payload) {
   try {
     await client.query('BEGIN');
 
-    const appointmentAdded = await client.query(
-      AppointmentQueries.update,
-      updateAppointmentValues(payload)
-    );
+    await client.query(AppointmentQueries.update, updateAppointmentValues(payload));
 
     const appointmentData = await client.query(
       AppointmentQueries.getAppointments('c.cod_cita = $1'), 
-      [appointmentAdded.rows[0].cod_cita]
+      [payload.cod_cita]
     );
 
     await client.query('COMMIT');

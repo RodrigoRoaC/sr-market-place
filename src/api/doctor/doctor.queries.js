@@ -46,6 +46,7 @@ const register =
       cod_doctor,
       cod_usuario,
       cod_especialidad,
+      cod_tipo_atencion,
       flag_activo,
       fec_registro,
       fec_actualizacion
@@ -55,6 +56,7 @@ const register =
       nextval('seq_cod_doctor'),
       $1,
       $2,
+      $3,
       '1',
       CURRENT_TIMESTAMP,
       CURRENT_TIMESTAMP

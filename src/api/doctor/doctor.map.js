@@ -1,9 +1,11 @@
 const addDoctorValues = ({
   cod_usuario,
   cod_especialidad,
+  cod_tipo_atencion,
 }) => ([
   cod_usuario,
   cod_especialidad,
+  cod_tipo_atencion,
 ]);
 
 const updateDoctorValues = ({

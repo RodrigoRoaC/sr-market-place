@@ -72,7 +72,7 @@ const register =
     $12, 
     $13, 
     $14,
-    7, 
+    $15, 
     CURRENT_TIMESTAMP, 
     CURRENT_TIMESTAMP
   ) 
