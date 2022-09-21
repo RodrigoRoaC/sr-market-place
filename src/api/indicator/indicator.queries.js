@@ -1,9 +1,21 @@
 const getBy = ({ whereParams }) => 
 `
   SELECT
-    *
+    indicadores.*,
+    mae_indicador.descripcion as nombre_mae_indicator,
+    mae_indicador.rango_minimo,
+    mae_indicador.rango_maximo,
+    pacientes.cod_paciente,
+    usuarios.num_documento,
+    usuarios.nombres || ' ' || usuarios.ape_paterno as nombres_paciente
   FROM
     indicadores
+  INNER JOIN
+    mae_indicador ON indicadores.cod_mae_indicator = mae_indicador.cod_mae_indicator
+  INNER JOIN 
+    pacientes ON pacientes.cod_paciente = indicadores.cod_paciente
+  INNER JOIN
+    usuarios ON usuarios.cod_usuario = pacientes.cod_usuario
   ${whereParams ? `WHERE ${whereParams}` : ''}
   ORDER BY
     indicadores.fec_actualizacion desc
@@ -37,7 +49,7 @@ const register =
     (
       nextval('seq_cod_indicadores'),
       $1,
-      $2,
+      TO_DATE($2,'DD/MM/YYYY'),
       $3,
       $4,
       $5,

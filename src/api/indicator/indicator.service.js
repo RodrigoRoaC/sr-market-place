@@ -5,7 +5,7 @@ const IndicatorQueries = require('./indicator.queries');
 async function list() {
   const client = await postgresql.getConnectionClient();
   try {
-    const indicatorRes = await client.query(IndicatorQueries.getBy());
+    const indicatorRes = await client.query(IndicatorQueries.getBy({}));
 
     return { data: indicatorRes.rows };
   } catch(err) {
@@ -81,7 +81,7 @@ async function remove(payload) {
 async function listMae() {
   const client = await postgresql.getConnectionClient();
   try {
-    const indicatorRes = await client.query(IndicatorQueries.getMaeBy());
+    const indicatorRes = await client.query(IndicatorQueries.getMaeBy({}));
 
     return { data: indicatorRes.rows };
   } catch(err) {

@@ -45,6 +45,20 @@ async function getUserByDoc(numDoc) {
   }
 }
 
+async function getPatientByDoc(numDoc) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const patient = await client.query(UserQueries.getPatientBy('num_documento = $1'), [numDoc]);
+
+    return { data: patient.rows[0] };
+  } catch(err) {
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 async function updateUserPayment({ nombres, ape_paterno, ape_materno, email, cod_usuario }) {
   const client = await postgresql.getConnectionClient();
   try {
@@ -108,6 +122,7 @@ module.exports = {
   getOperators,
   getPatientByUserCode,
   getUserByDoc,
+  getPatientByDoc,
   updateUserPayment,
   register,
   update,
