@@ -1,7 +1,7 @@
 const postgresql = require('../../database/postgresql');
 const Utils = require('../../utils/parser');
 const UserQueries = require('../user/user.queries');
-const { addUserValues, updateUserValues } = require('./user.map');
+const { addUserValues, updateUserValues, parsePatientFullName } = require('./user.map');
 
 async function getOperators() {
   const client = await postgresql.getConnectionClient();
@@ -51,6 +51,20 @@ async function getPatientByDoc(numDoc) {
     const patient = await client.query(UserQueries.getPatientBy('num_documento = $1'), [numDoc]);
 
     return { data: patient.rows[0] };
+  } catch(err) {
+
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
+async function getPatientCombo() {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const patient = await client.query(UserQueries.getPatientBy());
+
+    return { data: Utils.toComboData(parsePatientFullName(patient.rows), 'cod_paciente', 'nombre_paciente') };
   } catch(err) {
 
     return { error: true, details: err };
@@ -121,6 +135,7 @@ async function update(payload) {
 module.exports = {
   getOperators,
   getPatientByUserCode,
+  getPatientCombo,
   getUserByDoc,
   getPatientByDoc,
   updateUserPayment,

@@ -1,6 +1,6 @@
 const { request, response } = require('express');
-const { Ok, BDError } = require('../../helpers/http.helper');
-const { arrayToIndicatorValues } = require('../../utils/parser');
+const { Ok, BDError, BadRequest, NotFound } = require('../../helpers/http.helper');
+const Utils = require('../../utils/parser');
 const IndicatorService = require('./indicator.service');
 
 class IndicatorController {
@@ -19,7 +19,7 @@ class IndicatorController {
       return BadRequest(res, { message: 'No file provided' });
     }
 
-    const mapUploadPromises = arrayToIndicatorValues(file).map(IndicatorService.register);
+    const mapUploadPromises = Utils.arrayToIndicatorValues(file).map(IndicatorService.register);
     const uploadRes = await Promise.all(mapUploadPromises);
     if (uploadRes.every(u => u.error)) {
       return BDError(res, uploadRes);
@@ -65,6 +65,15 @@ class IndicatorController {
     return Ok(res, data);
   }
 
+  async listComboMae(req = request, res = response) {
+    const { error, details, data } = await IndicatorService.listMae();
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, Utils.toComboData(data, 'cod_mae_indicator', 'descripcion'));
+  }
+
   async registerMae(req = request, res = response) {
     const body = req.body;
     if (!body) {
@@ -91,6 +100,29 @@ class IndicatorController {
     }
 
     return Ok(res, data);
+  }
+
+  async patientResultChart(req = request, res = response) {
+    const cod_mae_indicator = +req.query.cod_mae_indicator;
+    const cod_patient = +req.query.cod_patient;
+    if (!cod_mae_indicator || !cod_patient) {
+      return BadRequest(res, { message: 'Patient and Indicator missing' });
+    }
+
+    const { error, details, data } = await IndicatorService.listBy({ cod_mae_indicator, cod_patient });
+    if (error) {
+      return BDError(res, details);
+    }
+
+    if (!data.length) {
+      return NotFound(res, { message: 'No results found' });
+    }
+
+    const labels = data.map(({ fec_atencion }) => Utils.parseLocalDate(fec_atencion));
+    const dataSets = data.map(({ valor }) => +valor);
+    const dataSetLabel = data[0].nombre_mae_indicator;
+
+    return Ok(res, { labels, dataSets, dataSetLabel });
   }
 }
 

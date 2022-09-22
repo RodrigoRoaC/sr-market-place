@@ -14,7 +14,7 @@ const addUserValues = ({
   telefono2 = null,
   username = null,
   cod_perfil = 7,
-}) => ([
+}) => [
   cod_tipo_doc,
   num_documento,
   nombres,
@@ -30,7 +30,7 @@ const addUserValues = ({
   telefono2,
   username,
   cod_perfil,
-]);
+];
 
 const updateUserValues = ({
   nombres = null,
@@ -45,8 +45,8 @@ const updateUserValues = ({
   telefono1 = null,
   telefono2 = null,
   username = null,
-  cod_usuario
-}) => ([
+  cod_usuario,
+}) => [
   nombres,
   ape_paterno,
   ape_materno,
@@ -59,10 +59,14 @@ const updateUserValues = ({
   telefono1,
   telefono2,
   username,
-  cod_usuario
-]);
+  cod_usuario,
+];
+
+const parsePatientFullName = (array) =>
+  array.map((a) => ({ ...a, nombre_paciente: `${a.nombres} ${a.ape_paterno} ${a.ape_materno || ''}` }));
 
 module.exports = {
   addUserValues,
   updateUserValues,
-}
+  parsePatientFullName,
+};

@@ -1,6 +1,7 @@
 const { indicatorColumns } = require("./excel-mapper");
 
 const parseDate = (date) => date ? new Date(date) : null;
+const parseLocalDate = (date) => date ? new Date(date).toLocaleDateString() : null;
 const parseTime = (time) => time ? new Date(time).toLocaleTimeString() : null;
 
 const parseDateToString = (date) => parseDate(date)?.toISOString().split('T')[0] || null;
@@ -32,6 +33,7 @@ const arrayToIndicatorValues = (array) => {
 
 module.exports = {
   parseDate,
+  parseLocalDate,
   parseTime,
   toComboData,
   parseDateToString,

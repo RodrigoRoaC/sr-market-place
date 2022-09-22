@@ -1,4 +1,4 @@
-const getBy = ({ whereParams }) => 
+const getBy = ({ whereParams, orderParams }) => 
 `
   SELECT
     indicadores.*,
@@ -18,7 +18,7 @@ const getBy = ({ whereParams }) =>
     usuarios ON usuarios.cod_usuario = pacientes.cod_usuario
   ${whereParams ? `WHERE ${whereParams}` : ''}
   ORDER BY
-    indicadores.fec_actualizacion desc
+    ${orderParams || 'indicadores.fec_actualizacion desc'}
 `;
 
 const getMaeBy = ({ whereParams }) => 

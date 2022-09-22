@@ -31,6 +31,15 @@ class UserController {
     return Ok(res, data);
   }
 
+  async getPatientCombo(req = request, res = response) {
+    const { error, details, data } = await UserService.getPatientCombo();
+    if (error) {
+      return BDError(res, details);
+    }
+
+    return Ok(res, data);
+  }
+
   async listOperators(req = request, res = response) {
     const { error, details, data } = await UserService.getOperators();
     if (error) {

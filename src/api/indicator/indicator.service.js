@@ -16,6 +16,22 @@ async function list() {
   }
 }
 
+async function listBy({ cod_mae_indicator, cod_patient }) {
+  const client = await postgresql.getConnectionClient();
+  try {
+    const whereParams = `pacientes.cod_paciente = ${cod_patient} AND indicadores.cod_mae_indicator = ${cod_mae_indicator}`;
+    const orderParams = 'indicadores.fec_atencion asc';
+    const indicatorRes = await client.query(IndicatorQueries.getBy({ whereParams, orderParams }));
+
+    return { data: indicatorRes.rows };
+  } catch(err) {
+    console.log(err);
+    return { error: true, details: err };
+  } finally {
+    client.release();
+  }
+}
+
 async function register(payload) {
   const client = await postgresql.getConnectionClient();
   try {
@@ -142,6 +158,7 @@ async function updateMae(payload) {
 
 module.exports = {
   list,
+  listBy,
   register,
   update,
   remove,

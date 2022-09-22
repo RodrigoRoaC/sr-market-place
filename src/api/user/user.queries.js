@@ -106,9 +106,8 @@ const getPatientBy = (whereParams) =>
   FROM 
     pacientes 
   INNER JOIN
-    usuarios ON usuarios.cod_usuario = pacientes.cod_usuario
-  WHERE 
-    ${whereParams}
+    usuarios ON usuarios.cod_usuario = pacientes.cod_usuario 
+  ${whereParams ? `WHERE ${whereParams}` : ''}
 `;
 
 const updatePatientPlan = 

@@ -7,6 +7,7 @@ const controller = new Controller();
 
 router.get('/list-operators', catchError(controller.listOperators));
 router.put('/update-user-payment', catchError(controller.updateUserPayment));
+router.get('/patient/combo', catchError(controller.getPatientCombo));
 router.get('/patient/:numDoc', catchError(controller.getPatientByDoc));
 router.get('/:numDoc', catchError(controller.getUserByDoc));
 
