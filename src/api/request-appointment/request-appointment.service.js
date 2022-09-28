@@ -48,12 +48,14 @@ async function add(appointment) {
 
     const newSolicitud = await client.query(ReqAppointmentQueries.insert, addReqAppointmentValues({ ...formatAppointment, cod_paciente }));
 
-    await client.query(AppointmentQueries.register, addAppointmentValues({
-      ...appointment,
-      observaciones: appointment.sintomas,
-      cod_solicitud: newSolicitud.rows[0].cod_solicitud,
-      fecha_reserva: appointment.fecha_programacion,
-    }));
+    if (!appointment.isReqByUser) {
+      await client.query(AppointmentQueries.register, addAppointmentValues({
+        ...appointment,
+        observaciones: appointment.sintomas,
+        cod_solicitud: newSolicitud.rows[0].cod_solicitud,
+        fecha_reserva: appointment.fecha_programacion,
+      }));
+    }
 
     const appointments = await client.query(
       ReqAppointmentQueries.getAppointmentBy('solicitud.cod_solicitud = $1'), 
@@ -65,7 +67,7 @@ async function add(appointment) {
     return { data: appointments.rows[0] };
   } catch(err) {
     await client.query('ROLLBACK');
-
+    console.log(err);
     return { error: true, details: err };
   } finally {
     client.release();

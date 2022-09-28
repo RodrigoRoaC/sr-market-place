@@ -5,9 +5,14 @@ const parseAppointment = ({
   fecha_programacion,
   fecha_autorizacion,
   hora_programacion,
+  isReqByUser,
+  cod_usuario,
+  cod_plan,
   ...rest
 }) => ({
   ...rest,
+  cod_plan: cod_plan || null,
+  cod_usuario: isReqByUser ? 2 : cod_usuario,
   fec_nacimiento: parseDate(fec_nacimiento),
   fecha_programacion: parseDate(fecha_programacion),
   fecha_autorizacion: parseDate(fecha_autorizacion),

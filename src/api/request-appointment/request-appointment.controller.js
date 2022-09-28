@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BadRequest, BDError } = require('../../helpers/http.helper');
+const { Ok, BadRequest, BDError, Forbidden } = require('../../helpers/http.helper');
 const ReqAppointmentService = require('./request-appointment.service');
 const AppointmentService = require('../appointment/appointment.service');
 
@@ -22,9 +22,6 @@ class AppointmentController {
     const body = req.body;
     if (!body) {
       return BadRequest(res, { message: 'You must provide a body' });
-    }
-    if (!body.cod_usuario) {
-      return Forbidden(res, { message: 'You must be a valid user' });
     }
 
     const { error, details, data } = await ReqAppointmentService.add(body);

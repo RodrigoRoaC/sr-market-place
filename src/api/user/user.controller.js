@@ -1,5 +1,5 @@
 const { request, response } = require('express');
-const { Ok, BDError } = require('../../helpers/http.helper');
+const { Ok, BDError, NotFound } = require('../../helpers/http.helper');
 const UserService = require('./user.service');
 
 class UserController {
@@ -26,6 +26,10 @@ class UserController {
     const { error, details, data } = await UserService.getPatientByDoc(numDoc);
     if (error) {
       return BDError(res, details);
+    }
+
+    if (!data) {
+      return NotFound(res, { message: 'User not found' });
     }
 
     return Ok(res, data);

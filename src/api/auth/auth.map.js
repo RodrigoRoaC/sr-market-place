@@ -3,6 +3,7 @@ const parseUserAuthResponse = (user) => ({
   nombres: user.nombres,
   username: user.username,
   cod_perfil: user.cod_perfil,
+  nom_perfil: user.descripcion,
 });
 
 module.exports = {
